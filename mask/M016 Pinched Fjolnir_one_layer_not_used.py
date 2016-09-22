@@ -1,0 +1,420 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul 03 18:01:11 2012
+@author: Ge
+"""
+
+from lib.MaskMaker import *
+
+import os
+import subprocess
+from time import sleep
+
+### Close DWG Viewer
+try:
+    subprocess.Popen(r'taskkill /F /im "dwgviewr.exe"')
+except:
+    pass
+
+### initialization    
+""" 
+    first try to calculate the proper gapw for a certain impedance. 
+    then calculate gapw for the resonator, which has a different centerpin 
+    width
+    """
+
+
+### Userful Classes
+class half_res():
+    @autoargs()
+    def __init__(self, s, freq, cap1, cap2, defaults={}):
+        self.interior_length = calculate_interior_length(self.freq,
+                                                         defaults['phase_velocity'],
+                                                         defaults['impedance'],
+                                                         resonator_type=0.5,
+                                                         harmonic=0,
+                                                         Ckin=cap1, Ckout=cap2)
+        print "Interior length is: %f" % (self.interior_length)
+        CPWWiggles(s, 5, self.interior_length / 2.)
+
+    # for c in [c1, c2, c3]:
+    ##TODO: Need to clean up the descriptions
+    # c.short_description = lambda: "a"
+    # c.long_description = lambda: "b"
+
+
+    ### initialization
+    """ 
+    first try to calculate the proper gapw for a certain impedance. 
+    then calculate gapw for the resonator, which has a different centerpin 
+    width
+    """
+
+
+### Userful Classes
+
+def set_mask_init():
+    ### Setting defaults
+    d = ChipDefaults()
+    d.Q = 1000
+    d.radius = 50
+    d.segments = 6
+    d.pinw_rsn = 2.  # this is the resonator pinwitdth that we are goign to use.
+    d.gapw_rsn = 8.5
+
+    d.pinw = 1.5  # d.pinw
+    d.gapw = 1.
+    d.center_gapw = 1
+    ### Now calculate impedance
+    d.imp_rsn = 80.  # calculate_impedance(d.pinw_rsn,d.gapw_rsn,d.eps_eff)
+    d.solid = True
+    return d
+
+
+def chipInit(c, defaults):
+    ### Components
+
+    ### left and right launch points
+    # experiment with different naming schemes for the launch points.
+    left_and_right_launcher_spacing = 750
+
+    launch_pt = translate_pt(c.left_midpt, (0, left_and_right_launcher_spacing / 2.))
+    setattr(c, 'sl1', Structure(c, start=launch_pt, direction=0, defaults=defaults))
+    launch_pt = translate_pt(c.left_midpt, (0, - left_and_right_launcher_spacing / 2.))
+    setattr(c, 'sl2', Structure(c, start=launch_pt, direction=0, defaults=defaults))
+    launch_pt = translate_pt(c.right_midpt, (0, left_and_right_launcher_spacing / 2.))
+    setattr(c, 'sr1', Structure(c, start=launch_pt, direction=180, defaults=defaults))
+    launch_pt = translate_pt(c.right_midpt, (0, - left_and_right_launcher_spacing / 2.))
+    setattr(c, 'sr2', Structure(c, start=launch_pt, direction=180, defaults=defaults))
+
+    ### Launchpoints
+    # setattr(c, "d", defaults)
+    setattr(c, 's1', Structure(c, start=c.top_midpt, direction=270, defaults=defaults))
+    setattr(c, 's2', Structure(c, start=c.bottom_midpt, direction=90, defaults=defaults))
+    setattr(c, 's3', Structure(c, start=c.left_midpt, direction=0, defaults=defaults))
+    setattr(c, 's4', Structure(c, start=c.right_midpt, direction=180, defaults=defaults))
+    setattr(c, 's5', Structure(c, start=c.top_left, direction=270, defaults=defaults))
+    setattr(c, 's6', Structure(c, start=c.top_right, direction=270, defaults=defaults))
+    setattr(c, 's7', Structure(c, start=c.bottom_left, direction=90, defaults=defaults))
+    setattr(c, 's8', Structure(c, start=c.bottom_right, direction=90, defaults=defaults))
+    # new anchor points
+    setattr(c, 's9', Structure(c, start=c.top_left_midpt, direction=270, defaults=defaults))
+    setattr(c, 's10', Structure(c, start=c.top_right_midpt, direction=270, defaults=defaults))
+    setattr(c, 's11', Structure(c, start=c.bottom_left_midpt, direction=90, defaults=defaults))
+    setattr(c, 's12', Structure(c, start=c.bottom_right_midpt, direction=90, defaults=defaults))
+    # new anchor points
+    setattr(c, 's13', Structure(c, start=c.top_left_mid_left, direction=270, defaults=defaults))
+    setattr(c, 's14', Structure(c, start=c.top_left_mid_right, direction=270, defaults=defaults))
+    setattr(c, 's15', Structure(c, start=c.top_right_mid_left, direction=270, defaults=defaults))
+    setattr(c, 's16', Structure(c, start=c.top_right_mid_right, direction=270, defaults=defaults))
+    setattr(c, 's17', Structure(c, start=c.bottom_left_mid_left, direction=90, defaults=defaults))
+    setattr(c, 's18', Structure(c, start=c.bottom_left_mid_right, direction=90, defaults=defaults))
+    setattr(c, 's19', Structure(c, start=c.bottom_right_mid_left, direction=90, defaults=defaults))
+    setattr(c, 's20', Structure(c, start=c.bottom_right_mid_right, direction=90, defaults=defaults))
+    FineAlign(c)
+
+
+def chipDrw_1(c, DC_pinw=.5, DC_gapw=.25, trap_pinw=0.1, trap_gapw=(.5 - .1) / 2., d=None):
+    ### Chip Init
+    # gapw=calculate_gap_width(eps_eff,50,pinw)
+
+    print d.__dict__.keys()
+    if d == None: d = ChipDefaults()
+    gap_ratio = d.gapw / d.pinw
+    c.frequency = 10
+    c.pinw = 1.5  # d.pinw
+    c.gapw = 1.
+    c.center_gapw = 1
+    c.radius = 40
+    c.frequency = 5  # GHz
+    # c.Q = 1000000 #one of the couplers
+    c.imp_rsn = 80
+    launch_pin_width = 150
+    launcher_width = (1 + 2 * gap_ratio) * launch_pin_width
+    c.launcher_length = 500
+    c.inside_padding = 1160
+    c.left_inside_padding = 180
+    c.C = 0.5e-15  # (factor of 2 smaller than actual value from simulation.)
+    c.cap1 = sapphire_capacitor_by_C_Channels(c.C)
+    # c.cap1 = sapphire_capacitor_by_Q_Channels(c.frequency, c.Q, 50, resonator_type=0.5)
+    ### Calculating the interior length of the resonator
+    # c.interior_length = calculate_interior_length(c.frequency, d.phase_velocity,
+    # c.imp_rsn, resonator_type=0.5,
+    # harmonic=0, Ckin=c.cap1, Ckout=c.cap1)
+    c.interior_length = 17631 / 2.  # unit is micron, devide by 2 to get the half wavelength
+    # This gives 6.88GHz in reality.
+    c.meander_length = c.interior_length  # (c.interior_length - (c.inside_padding))  - c.left_inside_padding
+    print 'meander_length', c.meander_length
+
+    c.num_wiggles = 7
+    c.meander_horizontal_length = (c.num_wiggles + 1) * 2 * c.radius
+    launcher_straight = 645
+    chipInit(c, defaults=d)
+
+    ### Components
+    #### Launcher
+    two_layer = c.two_layer
+
+    # Uncomment to make layer L1
+    # c.s3.chip.two_layer = False
+    # c.s4.chip.two_layer = False
+    # c.s5.chip.two_layer = False
+    # c.s7.chip.two_layer = False
+
+    # Launcher(c.s1)
+    # Launcher(c.s2)
+    # Launcher(c.s5)
+    # Launcher(c.s6)
+    # Launcher(c.s7)
+    # Launcher(c.s8)
+    # midpoints
+    # Launcher(c.s9)
+    # Launcher(c.s10)
+    # Launcher(c.s11)
+    # Launcher(c.s12)
+    # more mid points
+    # Launcher(c.s13)
+    # Launcher(c.s14)
+    # Launcher(c.s15)
+    # Launcher(c.s16)
+    # Launcher(c.s17)
+    # Launcher(c.s18)
+    # Launcher(c.s19)
+    # Launcher(c.s20)
+    c.s5.pinw = 4.
+    c.s5.gapw = 2.5
+    c.s7.pinw = 4.
+    c.s7.gapw = 2.5
+    c.s3.pinw2 = d.pinw_rsn
+    c.s4.pinw2 = d.pinw_rsn
+    if two_layer:
+        c.s5.chip.two_layer = True
+        c.s7.chip.two_layer = True
+
+    resonator_length = 22212.5  # for 10GHz
+    resonator_straight_tail = 430 + 360.15 + 0.6 + 10 - 0.75 - 37.09
+
+    length_before_turning = 20  # 220 + 116
+    turn_radius = 100
+    turn_radius_2 = 10
+
+    coupler_width_1 = 5
+    length_2 = 750 / 2. - turn_radius - turn_radius_2 - coupler_width_1
+    ### Left launchers and the drive resonator
+    s = c.sl1
+    Launcher(s, pinw=2, gapw=2)
+    CPWStraight(s, length_before_turning)
+    CPWBend(s, -90, radius=turn_radius, segments=10)
+    CPWStraight(s, length_2)
+    CPWBend(s, 90, radius=turn_radius_2, segments=10)
+    # CPWTaper(s, 10, 0.09, stop_pinw=1, stop_gapw=.5)
+
+    # Interaction driven programming: encourage trying code out and look at the output, instead of just reading code.
+    # such encouragements unlock new behaviors that positively re-enforce itself.
+    # this positive re-enforcement is what makes this kind of philosophical change significant.
+
+    s = c.sl2
+    Launcher(s, pinw=2, gapw=2)
+    CPWStraight(s, length_before_turning)
+    CPWBend(s, 90, radius=turn_radius, segments=10)
+    CPWStraight(s, length_2)
+    CPWBend(s, -90, radius=turn_radius_2, segments=10)
+    # CPWTaper(s, 10, 0.09, stop_pinw=1, stop_gapw=.5)
+
+    # c.sl1.last = middle(c.sl1.last, c.sl2.last)
+    # CPWWiggles(c.sl1, 1, 12, 1, start_up=True, radius=(1.5 + 2) / 2., segments=10)
+
+    # drive resonator from the left
+    coupler_length = 5
+    drive_resonator_start_pt = middle(c.sl1.last, c.sl2.last)
+    c.s_drive = Structure(c, start=drive_resonator_start_pt, direction=0)
+    CoupledTaper(c.s_drive, 6, pinw=c.sl1.pinw, gapw=c.sl1.gapw, center_gapw=8, stop_pinw=1.2, stop_gapw=1, stop_center_gapw=1)
+    CoupledStraight(c.s_drive, 50)
+    CoupledWiggles(c.s_drive, 16, resonator_length - 50 - resonator_straight_tail - 4 - 7, 0, start_up=True, radius=60,
+                   segments=10)
+    CoupledStraight(c.s_drive, resonator_straight_tail)
+
+    CoupledTaper(c.s_drive, 4, stop_center_gapw=0.22, stop_pinw=0.16, stop_gapw=0.220)
+    CoupledStraight(c.s_drive, 7.09)
+    c.s_drive.last = translate_pt(c.s_drive.last, (0, .19))
+    CPWBend(c.s_drive, -180, radius=0.19, segments=7)
+
+    ### Right launchers and the readout resonator
+
+    s = c.sr1
+    coupler_width_1 = 5
+    Launcher(s, pinw=2, gapw=2)
+    CPWStraight(s, length_before_turning)
+    CPWBend(s, 90, radius=turn_radius, segments=10)
+
+    length_2 = 750 / 2. - turn_radius - turn_radius_2 - coupler_width_1 / 2. - (c.sr1.pinw) / 2.  # - c.sr1.gapw
+
+    CPWStraight(s, length_2)
+    CPWBend(s, -90, radius=turn_radius_2, segments=10)
+    CPWStraight(s, 1)
+
+    s = c.sr2
+    Launcher(s, pinw=2, gapw=2)
+    CPWStraight(s, length_before_turning)
+    CPWBend(s, - 90, radius=turn_radius, segments=10)
+    CPWStraight(s, length_2)
+    CPWBend(s, 90, radius=turn_radius_2, segments=10)
+    CPWStraight(s, 1)
+
+    setattr(c, 's_read_coupler', Structure(c, start=translate_pt(c.sr1.last, (0, -c.sr1.pinw / 2.)), direction=0))
+    c.s_read_coupler.last_direction = 270
+    c.s_read_coupler.pinw = c.sr1.pinw
+    c.s_read_coupler.gapw = c.sr1.gapw
+    CPWStraight(c.s_read_coupler, coupler_width_1, gapw=4.) # this is the coupler.
+    # CPWWiggles(c.s_read_coupler, 1, 15, 0, start_up=True, radius=coupler_width_1 / 4., segments=5)
+
+    coupler_length = 1
+    CPWStraight(c.sr1, coupler_length)
+    CPWStraight(c.sr2, coupler_length)
+
+    # readout resonator on the right
+    readout_resonator_start_pt = middle(c.sr1.last, c.sr2.last)
+    c.s_readout = Structure(c, start=readout_resonator_start_pt, direction=180)
+    s = c.s_readout
+    # CoupledTaper(s, 4, pinw=c.sr1.pinw, gapw=c.sr1.gapw, center_gapw=coupler_width_1, stop_pinw=1, stop_gapw=1,
+    #              stop_center_gapw=coupler_length)
+
+    # this is what you need to change.
+    CoupledTaper(s, 4, pinw=c.sr1.pinw, gapw=c.sr1.gapw, center_gapw=coupler_width_1, stop_pinw=1.2, stop_gapw=1,
+                 stop_center_gapw=1)
+    CoupledStraight(s, 50)
+    CoupledWiggles(s, 16, resonator_length - 50 - resonator_straight_tail - 4 - 7, 0, start_up=True, radius=60,
+                   segments=10)
+    CoupledStraight(s, resonator_straight_tail)
+    CoupledTaper(s, 4, stop_center_gapw=0.22, stop_pinw=0.16, stop_gapw=0.220)
+    CoupledStraight(s, 6 + 0.6026 + 0.04900 - 0.1716)
+
+    # if not hasattr(s, 'gap_layer') and not hasattr(s, 'pin_layer'):
+    #     CPWStraight(s, .1225, pinw=0, gapw=.22 / 2.)
+
+    # DC bias lead
+    length_to_trap = 450 - 10
+    guard_middle_pinch_length = 5
+    s = c.s1
+    s.chip.two_layer = True
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWStraight(s, length_to_trap)
+    CPWTaper(s, 4, stop_pinw=1.22, stop_gapw=0.180)
+    CPWStraight(s, guard_middle_pinch_length)
+    CPWStraight(c.s1, 1, pinw = 0, gapw = 0.18 + 0.61)
+
+
+    s = c.s2
+    s.chip.two_layer = True
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWStraight(s, length_to_trap)
+    CPWTaper(s, 4, stop_pinw=1.22, stop_gapw=0.180)
+    CPWStraight(s, guard_middle_pinch_length)
+    CPWStraight(c.s2, 1, pinw = 0, gapw = 0.18 + 0.61)
+
+    mid_pt = middle(c.s1.last, c.s2.last)
+    s.last = mid_pt
+    Elipses(s, mid_pt, 0.85, 1.4, 0, 20)
+
+
+    s.chip.two_layer = True
+
+    middleGuardL = 1.2
+    sideGuardL = 0.2
+    guardGap = 0.2
+
+    guardLauncherStraight = 145 + 1.3759 + 0.3750
+    guardSHorizontal = 360 + 12.68 + 1.277 + 0.0707 - 0.220 - 0.0670 -0.1
+    guardEndStraight = 120 + 20.7
+    sideGuardEndStraight = 1.0 + 3.9897 + 0.255 - 0.12 - 0.25
+
+    s = c.s14
+    s.chip.two_layer = True
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWStraight(s, guardLauncherStraight)
+    CPWSturn(s, 20, 90, 90, guardSHorizontal, -60, 90, 20, segments=10)
+    CPWStraight(s, guardEndStraight)
+    CPWTaper(s, 4, stop_pinw=0.420, stop_gapw=0.180)
+    CPWBend(s, -30, radius=0.5, segments=2)
+    CPWStraight(s, sideGuardEndStraight)
+
+    s = c.s15
+    s.chip.two_layer = True
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWStraight(s, guardLauncherStraight)
+    CPWSturn(s, 20, -90, 90, guardSHorizontal, 60, 90, 20, segments=10)
+    CPWStraight(s, guardEndStraight)
+    CPWTaper(s, 4, stop_pinw=0.420, stop_gapw=0.180)
+    CPWBend(s, 30, radius=0.5, segments=2)
+    CPWStraight(s, sideGuardEndStraight)
+
+    s = c.s18
+    s.chip.two_layer = True
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWStraight(s, guardLauncherStraight)
+    CPWSturn(s, 20, -90, 90, guardSHorizontal, 60, 90, 20, segments=10)
+    CPWStraight(s, guardEndStraight)
+    CPWTaper(s, 4, stop_pinw=0.420, stop_gapw=0.180)
+    CPWBend(s, 30, radius=0.5, segments=2)
+    CPWStraight(s, sideGuardEndStraight)
+
+    s = c.s19
+    s.chip.two_layer = True
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWStraight(s, guardLauncherStraight)
+    CPWSturn(s, 20, 90, 90, guardSHorizontal, -60, 90, 20, segments=10)
+    CPWStraight(s, guardEndStraight)
+    CPWTaper(s, 4, stop_pinw=0.420, stop_gapw=0.180)
+    CPWBend(s, -30, radius=0.5, segments=2)
+    CPWStraight(s, sideGuardEndStraight)
+
+    s.chip.two_layer = True
+
+
+if __name__ == "__main__":
+    ### define mask name, and open up an explorer window
+    MaskName = "M016v4"  # M006 Constriction Gate Resonator"
+
+    m = WaferMask(MaskName, flat_angle=90., flat_distance=24100., wafer_padding=3.3e3, chip_size=(7000, 1900),
+                  dicing_border=500, etchtype=False, wafer_edge=False,
+                  dashed_dicing_border=50)
+    print "chip size: ", m.chip_size
+    # Smaller alignment markers as requested by Leo
+    points = [  # (-11025., -19125.),(-11025., 19125.),(11025., -19125.),(11025., 19125.),
+                (-15000., -13200.), (-15000., 13200.), (15000., -13200.), (15000., 13200.)]
+    AlignmentCross(m, linewidth=10, size=(1000, 1000), points=points, layer='gap', name='cross')
+    border_locs = [(-18750., 21600.), (18750., 21600.),
+                   (-18750., -21600.), (18750., -21600.)]
+    AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='gap', name='border_gap')
+    AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='pin', name='border_pin')
+    AlphaNumText(m, text="DIS 151028", size=(400, 400), point=(7650, -19300), centered=True,
+                 layer='gap')  # change the mask name/title here
+    AlphaNumText(m, text="M016 Ge Yang", size=(400, 400), point=(7650, -18500), centered=True,
+                 layer='gap')  # change the mask name/title here
+    AlphaNumText(m, text="DIS 151028 M016 Ge Yang", size=(700, 700), point=(0, 20500), centered=True,
+                 layer='gap')  # change the mask name/title here
+
+    # m.randomize_layout()
+    d = set_mask_init()
+    # two_layer = True
+    # solid = False
+    two_layer = True
+    solid = True
+    c1 = Chip('Fjolnir', author='GeYang', size=m.chip_size, mask_id_loc=(5050, 1720),
+              chip_id_loc=(4840, 100), two_layer=two_layer, solid=solid, segments=10)
+    c = c1
+    c.textsize = (80, 80)
+    chipDrw_1(c, DC_pinw=.5, DC_gapw=.25, trap_pinw=0.5, trap_gapw=.25, d=d)
+    m.add_chip(c, 1)
+    print "current point is ", m.current_point
+
+    m.save()
+    ### Check and open the folder
+    print 'current directory ', os.getcwd()
+    # subprocess.Popen(r'explorer /select,'+os.getcwd()+'\\'+MaskName+'.dxf')
+    # subprocess.Popen(r'explorer /select,'+os.getcwd()+'\\'+MaskName+'-'+c.name+'.dxf')
+    sleep(.1)
+    subprocess.Popen(
+        r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '-' + c1.name + '.dxf" ')
+    # subprocess.Popen(
+    #     r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '.dxf" ')
