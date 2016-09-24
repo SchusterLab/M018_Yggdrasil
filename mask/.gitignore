@@ -1,2 +1,4 @@
 # Ignore the mask maker library.
 MaskMaker
+*.dxf
+*_manifest.txt

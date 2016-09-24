@@ -9,6 +9,7 @@ from lib.MaskMaker import *
 import os
 import subprocess
 from time import sleep
+from termcolor import colored, cprint
 
 ### Close DWG Viewer
 try:
@@ -34,7 +35,7 @@ class half_res():
                                                          resonator_type=0.5,
                                                          harmonic=0,
                                                          Ckin=cap1, Ckout=cap2)
-        print "Interior length is: %f" % (self.interior_length)
+        print("Interior length is: %f" % (self.interior_length))
         CPWWiggles(s, 5, self.interior_length / 2.)
 
     # for c in [c1, c2, c3]:
@@ -118,7 +119,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     ### Chip Init
     # gapw=calculate_gap_width(eps_eff,50,pinw)
 
-    print d.__dict__.keys()
+    print(d.__dict__.keys())
     if d == None: d = ChipDefaults()
     gap_ratio = d.gapw / d.pinw
     c.frequency = 10
@@ -144,7 +145,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     c.interior_length = 17631 / 2.  # unit is micron, devide by 2 to get the half wavelength
     # This gives 6.88GHz in reality.
     c.meander_length = c.interior_length  # (c.interior_length - (c.inside_padding))  - c.left_inside_padding
-    print 'meander_length', c.meander_length
+    print('meander_length', c.meander_length)
 
     c.num_wiggles = 7
     c.meander_horizontal_length = (c.num_wiggles + 1) * 2 * c.radius
@@ -326,7 +327,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     CPWStraight(coupler_2, 1.5, pinw=0, gapw=4.5 / 2.)
 
     ### DC Guards
-    guard_pin_w = 0.8;
+    guard_pin_w = 0.8
 
     s = c.s14
     s.chip.two_layer = False
@@ -373,12 +374,12 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
 if __name__ == "__main__":
     ### define mask name, and open up an explorer window
-    MaskName = "M016v5"  # M006 Constriction Gate Resonator"
+    MaskName = "M016V5"  # M006 Constriction Gate Resonator"
 
     m = WaferMask(MaskName, flat_angle=90., flat_distance=24100., wafer_padding=3.3e3, chip_size=(7000, 1900),
                   dicing_border=400, etchtype=False, wafer_edge=False,
                   dashed_dicing_border=50)
-    print "chip size: ", m.chip_size
+    print("chip size: ", m.chip_size)
     # Smaller alignment markers as requested by Leo
     points = [  # (-11025., -19125.),(-11025., 19125.),(11025., -19125.),(11025., 19125.),
         (-15000., -13200.), (-15000., 13200.), (15000., -13200.), (15000., 13200.)]
@@ -404,7 +405,7 @@ if __name__ == "__main__":
     for i, resonator_length in enumerate([3000, 2750, 2500]):
         for j, coupler_length in enumerate([50, 45, 40]):
             chip_name = 'FjolnirV5r{}c{}'.format(i + 1, j + 1)
-            print 'chip name: ', chip_name
+            print('chip name: ', chip_name)
             c = Chip(chip_name, author='GeYang', size=m.chip_size, mask_id_loc=(5050, 1720),
                      chip_id_loc=(4540, 100), two_layer=two_layer, solid=solid, segments=10)
             c.textsize = (80, 80)
@@ -413,11 +414,19 @@ if __name__ == "__main__":
 
     m.save()
     ### Check and open the folder
-    print 'current directory ', os.getcwd()
+    print('current directory ', os.getcwd())
     # subprocess.Popen(r'explorer /select,'+os.getcwd()+'\\'+MaskName+'.dxf')
     # subprocess.Popen(r'explorer /select,'+os.getcwd()+'\\'+MaskName+'-'+c.name+'.dxf')
     sleep(.1)
-    # subprocess.Popen(
-    #     r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '-' + c.name + '.dxf" ')
-    subprocess.Popen(
-        r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '.dxf" ')
+
+    cprint(
+        colored("operating system is: ", 'grey') +
+        colored(os.name, 'green')
+    )
+    if (os.name == 'posix'):
+        subprocess.call('open -a "AutoCAD 2016" ' + os.getcwd() + '/' + MaskName + '.dxf', shell=True)
+    elif (os.name == 'nt'):
+        # subprocess.Popen(
+        #     r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '-' + c.name + '.dxf" ')
+        subprocess.Popen(
+            r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '.dxf" ')
