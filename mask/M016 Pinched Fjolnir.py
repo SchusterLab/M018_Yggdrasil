@@ -414,19 +414,19 @@ if __name__ == "__main__":
 
     m.save()
     ### Check and open the folder
-    print('current directory ', os.getcwd())
-    # subprocess.Popen(r'explorer /select,'+os.getcwd()+'\\'+MaskName+'.dxf')
-    # subprocess.Popen(r'explorer /select,'+os.getcwd()+'\\'+MaskName+'-'+c.name+'.dxf')
+    cprint(
+        colored('current directory ', 'grey') +
+        colored(os.getcwd(), 'green')
+    )
     sleep(.1)
 
     cprint(
         colored("operating system is: ", 'grey') +
         colored(os.name, 'green')
     )
-    if (os.name == 'posix'):
-        subprocess.call('open -a "AutoCAD 2016" ' + os.getcwd() + '/' + MaskName + '.dxf', shell=True)
-    elif (os.name == 'nt'):
-        # subprocess.Popen(
-        #     r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '-' + c.name + '.dxf" ')
+    chip_path = os.path.join(os.getcwd(), MaskName + '-' + c.name + '.dxf')
+    if os.name == 'posix':
+        subprocess.call('open -a "AutoCAD 2016" ' + chip_path, shell=True)
+    elif os.name == 'nt':
         subprocess.Popen(
-            r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + os.getcwd() + '\\' + MaskName + '.dxf" ')
+            r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + chip_path + '" ')
