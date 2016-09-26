@@ -2,3 +2,9 @@
 MaskMaker
 *.dxf
 *_manifest.txt
+
+
+# AutoCAD work files
+*.dwl
+*.dwl2
+*.dwl*

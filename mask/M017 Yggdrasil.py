@@ -402,7 +402,7 @@ if __name__ == "__main__":
     two_layer = True
     solid = True
 
-    for i, resonator_length in enumerate([3000, 2750, 2500]):
+    for i, resonator_length in enumerate([2440, 2140, 1900]):
         for j, coupler_length in enumerate([50, 45, 40]):
             chip_name = 'FjolnirV5r{}c{}'.format(i + 1, j + 1)
             print('chip name: ', chip_name)
