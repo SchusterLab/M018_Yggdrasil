@@ -204,7 +204,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     CoupledTaper(c.s_drive, 6, pinw=c.sl1.pinw, gapw=c.sl1.gapw, center_gapw=8, stop_pinw=1.2, stop_gapw=1,
                  stop_center_gapw=1)
     CoupledStraight(c.s_drive, 50)
-    CoupledStraight(c.s_drive, 2500 + 302.910)
+    CoupledStraight(c.s_drive, 2500 + 302.910 - 300)
 
     CoupledTaper(c.s_drive, 4, stop_center_gapw=0.22, stop_pinw=0.16, stop_gapw=0.220)
     CoupledStraight(c.s_drive, 7.09)
@@ -218,7 +218,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     s.pinw = 1.2
     s.gapw = 1
     Launcher(s)
-    CPWStraight(s, 3000 - chip_resonator_length + 280 + 229.890)
+    CPWStraight(s, 3000 - chip_resonator_length + 280 + 229.890 + 300)
     CPWTaper(s, 1, stop_pinw=.380, stop_gapw=.210)
     CPWStraight(s, 4.5)
     CPWTaper(s, 1, stop_pinw=1.5, stop_gapw=1.5)
@@ -226,7 +226,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     CPWTaper(s, 3, stop_pinw=3.4, stop_gapw=1)
 
     # readout resonator on the right
-    readout_resonator_start_pt = translate_pt(c.center, (chip_resonator_length - 529.390, 0))
+    readout_resonator_start_pt = translate_pt(c.center, (chip_resonator_length - 529.390 - 300, 0))
     c.s_readout = Structure(c, start=readout_resonator_start_pt, direction=180)
     s = c.s_readout
     s.pinw = 1.2
@@ -245,21 +245,27 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     # DC bias lead
     length_to_trap = 450 - 10
     guard_middle_pinch_length = 5
-    s = c.s1
+    guardSHorizontal = 445. - 300
+
+    s = c.s14
     s.chip.two_layer = False
     Launcher(s, pinw=1.5, gapw=1.5)
-    CPWStraight(s, length_to_trap)
+    CPWStraight(s, length_to_trap - 400)
+    CPWSturn(s, 20, 90, 90, guardSHorizontal, -90, 90, 20, segments=10)
+    CPWStraight(s, 180.51)
     CPWTaper(s, 4, stop_pinw=1.22, stop_gapw=0.180)
     CPWStraight(s, guard_middle_pinch_length)
 
-    s = c.s2
+    s = c.s18
     s.chip.two_layer = False
     Launcher(s, pinw=1.5, gapw=1.5)
-    CPWStraight(s, length_to_trap)
+    CPWStraight(s, length_to_trap - 400)
+    CPWSturn(s, 20, -90, 90, guardSHorizontal, 90, 90, 20, segments=10)
+    CPWStraight(s, 180.51)
     CPWTaper(s, 4, stop_pinw=1.22, stop_gapw=0.180)
     CPWStraight(s, guard_middle_pinch_length)
 
-    mid_pt = middle(c.s1.last, c.s2.last)
+    mid_pt = translate_pt(middle(c.s1.last, c.s2.last), (-300, 0))
     s.last = mid_pt
     Elipses(s, mid_pt, 0.85, 1.4, 0, 20)
     Elipses(s, mid_pt, 0.85 - 0.2, 1.4 - 0.2, 0, 20)
@@ -276,34 +282,42 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     sideGuardEndStraight = 1.0 + 3.9897 + 0.255 - 0.12 - 0.25
 
     ### Microwave Feed Couplers
-    s = c.s6
+
+    L1 = 20
+    L2 = 100
+    L3 = 199.5 - 0.0013 - 80
+    L4 = 500 - 386.6025
+
+    s = c.s15
     s.chip.two_layer = False
     s.pinw = 3
     s.gapw = 1
     Launcher(s)
-    CPWStraight(s, 20 + 1.332)
-    CPWBend(s, -82.5, radius=100, segments=12)
-    CPWStraight(s, 1700)
-    CPWBend(s, -7.5, radius=50, segments=12)
-    CPWStraight(s, chip_coupler_length - 50 + 465 - 0.2407 - 43.6893)
+    CPWStraight(s, L1)
+    CPWSturn(s, 20, -90, 20, 300 - 40, 90, 20, L3, segments=5)
+    CPWBend(s, -60, radius=100, segments=12)
+    CPWStraight(s, L2)
+    CPWBend(s, -30, radius=50, segments=12)
+    CPWStraight(s, chip_coupler_length + L4)
     CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
-    s = c.s8
+    s = c.s19
     s.chip.two_layer = False
     s.pinw = 3
     s.gapw = 1
     Launcher(s)
-    CPWStraight(s, 20 + 1.332)
-    CPWBend(s, 82.5, radius=100, segments=12)
-    CPWStraight(s, 1700)
-    CPWBend(s, 7.5, radius=50, segments=12)
-    CPWStraight(s, chip_coupler_length - 50 + 465 - 0.2407 - 43.6893)
+    CPWStraight(s, L1)
+    CPWSturn(s, 20, 90, 20, 300 - 40, -90, 20, L3, segments=5)
+    CPWBend(s, 60, radius=100, segments=12)
+    CPWStraight(s, L2)
+    CPWBend(s, 30, radius=50, segments=12)
+    CPWStraight(s, chip_coupler_length + L4)
     CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
     ### Resonator Couplers
     c.two_layer = True
     coupler_offset_v = 1.5 + 1.2 - 1.
-    coupler_offset_h = 400
+    coupler_offset_h = 100
     launch_pt = translate_pt(c.center, (coupler_offset_h, coupler_offset_v))
     setattr(c, 'resonator_coupler_1', Structure(c, start=launch_pt, direction=90))
     launch_pt = translate_pt(c.center, (coupler_offset_h, -coupler_offset_v))
@@ -329,41 +343,61 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     ### DC Guards
     guard_pin_w = 0.8
 
-    s = c.s14
+    s = c.s5
     s.chip.two_layer = False
     Launcher(s, pinw=1.5, gapw=1.5)
     CPWStraight(s, guardLauncherStraight)
-    CPWSturn(s, 20, 90, 90, guardSHorizontal, -60, 90, 20, segments=10)
+    CPWSturn(s, 20, 90, 90, guardSHorizontal + 1875 - 300, -60, 90, 20, segments=10)
     CPWStraight(s, guardEndStraight)
     CPWTaper(s, 4, stop_pinw=guard_pin_w, stop_gapw=0.180)
     CPWBend(s, -30, radius=0.5, segments=2)
     CPWStraight(s, sideGuardEndStraight)
 
-    s = c.s15
+    s = c.s7
     s.chip.two_layer = False
     Launcher(s, pinw=1.5, gapw=1.5)
     CPWStraight(s, guardLauncherStraight)
-    CPWSturn(s, 20, -90, 90, guardSHorizontal, 60, 90, 20, segments=10)
+    CPWSturn(s, 20, -90, 90, guardSHorizontal + 1875 - 300, 60, 90, 20, segments=10)
     CPWStraight(s, guardEndStraight)
     CPWTaper(s, 4, stop_pinw=guard_pin_w, stop_gapw=0.180)
     CPWBend(s, 30, radius=0.5, segments=2)
     CPWStraight(s, sideGuardEndStraight)
 
-    s = c.s18
+    # Bias DC Pinch DC Electrodes
+    L1 = 20
+    R = 20
+    L2 = 1450 - 40 - 36.86
+
+    L4 = 5
+
+    L3 = 450 - 40 - L1 - 0.4 - L4
+
+    s = c.s6
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWSturn(s, L1, -90, R, L2, 90, R, L3, segments=3)
+    CPWTaper(s, L4, stop_pinw=4, stop_gapw=0.25)
+
+    s = c.s8
+    Launcher(s, pinw=1.5, gapw=1.5)
+    CPWSturn(s, L1, 90, R, L2, -90, R, L3, segments=3)
+    CPWTaper(s, L4, stop_pinw=4, stop_gapw=0.25)
+
+    # Resonator Side Guards
+    s = c.s1
     s.chip.two_layer = False
     Launcher(s, pinw=1.5, gapw=1.5)
     CPWStraight(s, guardLauncherStraight)
-    CPWSturn(s, 20, -90, 90, guardSHorizontal, 60, 90, 20, segments=10)
+    CPWSturn(s, 20, -90, 90, guardSHorizontal - 325, 60, 90, 20, segments=10)
     CPWStraight(s, guardEndStraight)
     CPWTaper(s, 4, stop_pinw=guard_pin_w, stop_gapw=0.180)
-    CPWBend(s, 30, radius=0.5, segments=2)
+    CPWBend(s, 30, radius=0.3, segments=2)
     CPWStraight(s, sideGuardEndStraight)
 
-    s = c.s19
+    s = c.s2
     s.chip.two_layer = False
     Launcher(s, pinw=1.5, gapw=1.5)
     CPWStraight(s, guardLauncherStraight)
-    CPWSturn(s, 20, 90, 90, guardSHorizontal, -60, 90, 20, segments=10)
+    CPWSturn(s, 20, 90, 90, guardSHorizontal - 325, -60, 90, 20, segments=10)
     CPWStraight(s, guardEndStraight)
     CPWTaper(s, 4, stop_pinw=guard_pin_w, stop_gapw=0.180)
     CPWBend(s, -30, radius=0.5, segments=2)
@@ -404,7 +438,7 @@ if __name__ == "__main__":
 
     for i, resonator_length in enumerate([2440, 2140, 1900]):
         for j, coupler_length in enumerate([50, 45, 40]):
-            chip_name = 'FjolnirV5r{}c{}'.format(i + 1, j + 1)
+            chip_name = 'YggdrasilV1r{}c{}'.format(i + 1, j + 1)
             print('chip name: ', chip_name)
             c = Chip(chip_name, author='GeYang', size=m.chip_size, mask_id_loc=(5050, 1720),
                      chip_id_loc=(4540, 100), two_layer=two_layer, solid=solid, segments=10)
