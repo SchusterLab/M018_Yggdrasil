@@ -390,7 +390,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     CPWSturn(s, 20, -90, 90, guardSHorizontal - 325, 60, 90, 20, segments=10)
     CPWStraight(s, guardEndStraight)
     CPWTaper(s, 4, stop_pinw=guard_pin_w, stop_gapw=0.180)
-    CPWBend(s, 30, radius=0.3, segments=2)
+    CPWBend(s, 30, radius=0.5, segments=2)
     CPWStraight(s, sideGuardEndStraight)
 
     s = c.s2
