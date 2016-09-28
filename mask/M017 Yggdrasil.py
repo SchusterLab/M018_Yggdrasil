@@ -366,7 +366,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     # Bias DC Pinch DC Electrodes
     L1 = 20
     R = 20
-    L2 = 1450 - 40 - 36.86
+    L2 = - (resonator_length - 1900) + 1450 - 40 - 36.86
 
     L4 = 5
 
