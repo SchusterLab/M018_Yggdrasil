@@ -236,7 +236,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     CoupledWiggles(s, 6, 1000, 0, start_up=True, radius=30,
                    segments=10)
     CoupledStraight(s, resonator_length - 1000 - 1 - 1.16)
-    CoupledTaper(s, 1, stop_center_gapw=0.22, stop_pinw=0.16, stop_gapw=0.220 + 1.210)
+    CoupledTaper(s, 1, stop_center_gapw=0.22, stop_pinw=0.16, stop_gapw=0.220 + 2.210 - 1.5)
     CoupledStraight(s, 1.16, center_gapw=0.22, pinw=0.16, gapw=0.220)
 
     # if not hasattr(s, 'gap_layer') and not hasattr(s, 'pin_layer'):
