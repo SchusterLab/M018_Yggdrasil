@@ -206,10 +206,10 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     CoupledStraight(c.s_drive, 50)
     CoupledStraight(c.s_drive, 2500 + 302.910 - 300)
 
-    CoupledTaper(c.s_drive, 4, stop_center_gapw=0.22, stop_pinw=0.16, stop_gapw=0.220)
+    CoupledTaper(c.s_drive, 4, stop_center_gapw=0.0, stop_pinw=0.16 + 0.110, stop_gapw=0.220)
     CoupledStraight(c.s_drive, 7.09)
-    c.s_drive.last = translate_pt(c.s_drive.last, (0, .19))
-    CPWBend(c.s_drive, -180, radius=0.19, segments=7)
+    c.s_drive.last = translate_pt(c.s_drive.last, (0, .19 - 0.0550))
+    CPWBend(c.s_drive, -180, radius=0.19 - 0.055, segments=7)
 
     ### Right launchers and the readout resonator
 
