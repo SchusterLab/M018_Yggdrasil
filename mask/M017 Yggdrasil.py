@@ -283,22 +283,23 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
     ### Microwave Feed Couplers
 
-    L1 = 20
-    L2 = 100
-    L3 = 199.5 - 0.0013 - 80
-    L4 = 500 - 386.6025
+    R1 = 100
+    L1 = 0
+    L2 = 300 - 80 - 40 - 40
+    L3 = 199.5 - 0.0013 - 120 - 40 - 40
+    L4 = 100
+    L5 = 500 - 386.6025 - 40
 
     s = c.s15
     s.chip.two_layer = False
     s.pinw = 3
     s.gapw = 1
     MaskMaker.Launcher(s)
-    MaskMaker.CPWStraight(s, L1)
-    MaskMaker.CPWSturn(s, 20, -90, 20, 300 - 40, 90, 20, L3, segments=5)
+    MaskMaker.CPWSturn(s, L1, -90, R1, L2, 90, R1, L3, segments=5)
     MaskMaker.CPWBend(s, -60, radius=100, segments=12)
-    MaskMaker.CPWStraight(s, L2)
+    MaskMaker.CPWStraight(s, L4)
     MaskMaker.CPWBend(s, -30, radius=50, segments=12)
-    MaskMaker.CPWStraight(s, chip_coupler_length + L4)
+    MaskMaker.CPWStraight(s, chip_coupler_length + L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
     s = c.s19
@@ -306,12 +307,11 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     s.pinw = 3
     s.gapw = 1
     MaskMaker.Launcher(s)
-    MaskMaker.CPWStraight(s, L1)
-    MaskMaker.CPWSturn(s, 20, 90, 20, 300 - 40, -90, 20, L3, segments=5)
+    MaskMaker.CPWSturn(s, L1, 90, R1, L2, -90, R1, L3, segments=5)
     MaskMaker.CPWBend(s, 60, radius=100, segments=12)
-    MaskMaker.CPWStraight(s, L2)
+    MaskMaker.CPWStraight(s, L4)
     MaskMaker.CPWBend(s, 30, radius=50, segments=12)
-    MaskMaker.CPWStraight(s, chip_coupler_length + L4)
+    MaskMaker.CPWStraight(s, chip_coupler_length + L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
     ### Resonator Couplers
@@ -366,21 +366,21 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     # Bias DC Pinch DC Electrodes
     L1 = 20
     R = 20
-    L2 = - (resonator_length - 1900) + 1450 - 40 - 36.86
+    L3 = - (resonator_length - 1900) + 1450 - 40 - 36.86
 
-    L4 = 5
+    L5 = 5
 
-    L3 = 450 - 40 - L1 - 0.4 - L4
+    L4 = 450 - 40 - L1 - 0.4 - L5
 
     s = c.s6
     MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
-    MaskMaker.CPWSturn(s, L1, -90, R, L2, 90, R, L3, segments=3)
-    MaskMaker.CPWTaper(s, L4, stop_pinw=4, stop_gapw=0.25)
+    MaskMaker.CPWSturn(s, L1, -90, R, L3, 90, R, L4, segments=3)
+    MaskMaker.CPWTaper(s, L5, stop_pinw=4, stop_gapw=0.25)
 
     s = c.s8
     MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
-    MaskMaker.CPWSturn(s, L1, 90, R, L2, -90, R, L3, segments=3)
-    MaskMaker.CPWTaper(s, L4, stop_pinw=4, stop_gapw=0.25)
+    MaskMaker.CPWSturn(s, L1, 90, R, L3, -90, R, L4, segments=3)
+    MaskMaker.CPWTaper(s, L5, stop_pinw=4, stop_gapw=0.25)
 
     # Resonator Side Guards
     s = c.s1
