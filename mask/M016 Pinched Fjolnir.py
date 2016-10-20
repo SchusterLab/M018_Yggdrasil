@@ -36,7 +36,7 @@ class half_res():
                                                          harmonic=0,
                                                          Ckin=cap1, Ckout=cap2)
         print("Interior length is: %f" % (self.interior_length))
-        CPWWiggles(s, 5, self.interior_length / 2.)
+        mm.CPWWiggles(s, 5, self.interior_length / 2.)
 
     # for c in [c1, c2, c3]:
     ##TODO: Need to clean up the descriptions
