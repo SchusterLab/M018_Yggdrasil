@@ -408,7 +408,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
 if __name__ == "__main__":
     ### define mask name, and open up an explorer window
-    MaskName = "M017V5"  # M006 Constriction Gate Resonator"
+    MaskName = "M017V1"  # M006 Constriction Gate Resonator"
 
     m = MaskMaker.WaferMask(MaskName, flat_angle=90., flat_distance=24100., wafer_padding=3.3e3, chip_size=(7000, 1900),
                             dicing_border=400, etchtype=False, wafer_edge=False,
