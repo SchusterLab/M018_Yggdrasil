@@ -111,7 +111,7 @@ def chipInit(c, defaults):
     setattr(c, 's18', MaskMaker.Structure(c, start=c.bottom_left_mid_right, direction=90, defaults=defaults))
     setattr(c, 's19', MaskMaker.Structure(c, start=c.bottom_right_mid_left, direction=90, defaults=defaults))
     setattr(c, 's20', MaskMaker.Structure(c, start=c.bottom_right_mid_right, direction=90, defaults=defaults))
-    MaskMaker.FineAlign(c)
+    MaskMaker.FineAlign(c, al=25, mark_type='box')
 
 
 def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
@@ -417,7 +417,7 @@ if __name__ == "__main__":
     # Smaller alignment markers as requested by Leo
     points = [  # (-11025., -19125.),(-11025., 19125.),(11025., -19125.),(11025., 19125.),
         (-15000., -13200.), (-15000., 13200.), (15000., -13200.), (15000., 13200.)]
-    MaskMaker.AlignmentCross(m, linewidth=10, size=(1000, 1000), points=points, layer='gap', name='cross')
+    MaskMaker.AlignmentBox(m, linewidth=10, size=(100, 100), points=points, layer='gap', name='alignment_box')
     border_locs = [(-18750., 21600.), (18750., 21600.),
                    (-18750., -21600.), (18750., -21600.)]
     MaskMaker.AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='gap', name='border_gap')
