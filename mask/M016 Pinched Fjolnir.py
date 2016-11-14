@@ -261,8 +261,8 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
     mid_pt = util.middle(c.s1.last, c.s2.last)
     s.last = mid_pt
-    mm.Elipses(s, mid_pt, 0.85, 1.4, 0, 20)
-    mm.Elipses(s, mid_pt, 0.85 - 0.2, 1.4 - 0.2, 0, 20)
+    mm.Ellipses(s, mid_pt, 0.85, 1.4, 0, 20)
+    mm.Ellipses(s, mid_pt, 0.85 - 0.2, 1.4 - 0.2, 0, 20)
 
     s.chip.two_layer = True
 

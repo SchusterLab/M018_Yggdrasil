@@ -267,8 +267,8 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
     mid_pt = MaskMaker.translate_pt(MaskMaker.middle(c.s1.last, c.s2.last), (-300, 0))
     s.last = mid_pt
-    MaskMaker.Elipses(s, mid_pt, 0.85, 1.4, 0, 20)
-    MaskMaker.Elipses(s, mid_pt, 0.85 - 0.2, 1.4 - 0.2, 0, 20)
+    MaskMaker.Ellipses(s, mid_pt, 0.85, 1.4, 0, 20)
+    MaskMaker.Ellipses(s, mid_pt, 0.85 - 0.2, 1.4 - 0.2, 0, 20)
 
     s.chip.two_layer = True
 
