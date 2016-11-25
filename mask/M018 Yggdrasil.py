@@ -24,6 +24,48 @@ except:
     width
     """
 
+"""regex used to parse definition below:
+^([A-z]*)\t([0-9]*)\t([^\t]*)\t(.*)$
+$1 = $2 # $3 :=> $4
+
+
+"""
+nm = 1e-3
+# Name	Value	Unit	"Evaluated Value"	Type
+substrat_T = 800 * nm  # nm :=> 800nm	Design
+substrate_T = 800 * nm  # nm :=> 800nm	Design
+metal_T = 80 * nm  # nm :=> 80nm	Design
+box_H = 20  # um :=> 20um	Design
+helium_level = 730 * nm  # nm :=> 730nm	Design
+box_W = 20  # um :=> 20um	Design
+box_L = 60  # um :=> 60um	Design
+end_cap_L = 1  # um :=> 1um	Design
+guard_extra_W = 0 * nm  # nm :=> 0nm	Design
+trap_guard_L = 1.5  # :=> um	1.5um	Design
+res_pin_W = 720 * nm  # nm :=> 720nm	Design
+res_center_gap_W = 500 * nm  # nm :=> 500nm	Design
+res_gp_gap_W = 500 * nm  # nm :=> 500nm	Design
+trap_W = 8  # um :=> 8um	Design
+trap_L = 3  # um :=> 3um	Design
+trap_ratio = trap_L / trap_W  # :=> 0.375	Design
+trap_gap = 250 * nm  # nm :=> 250nm	Design
+trap_pin_W = 200 * nm  # nm :=> 200nm	Design
+center_guard_L = trap_L  # :=> 3um	Design
+guard_gap = 250 * nm  # nm :=> 250nm	Design
+channel_W = res_pin_W * 2 + res_center_gap_W + res_gp_gap_W * 2  # :=> 2940nm	Design
+guard_W = box_W / 2 - channel_W / 2 + guard_extra_W  # :=> 8.53um	Design
+ground_Y0 = center_guard_L / 2 + guard_gap * 2 + trap_guard_L  # :=> 3.5um	Design
+trap_pin_Y0 = -(center_guard_L / 2 + guard_gap + trap_guard_L)  # :=> -3.25um	Design
+res_pin_Y0 = -trap_pin_Y0  # :=> 3.25e-006	Design
+res_pin_trap_outer_A = trap_W / 2 - trap_gap - 0.400 * nm  # nm # :=> 3.35um	Design
+res_pin_trap_outer_ratio = (trap_L / 2 - trap_gap - 0.200) / res_pin_trap_outer_A  # :=> 0.3134328358209	Design
+res_pin_trap_inner_A = res_pin_trap_outer_A - trap_gap - 1.200  # :=> 1.9um	Design
+res_pin_trap_inner_ratio = (
+                               res_pin_trap_outer_A * res_pin_trap_outer_ratio - trap_gap - 0.300) / res_pin_trap_inner_A  # :=> 0.26315789473684	Design
+trap_pin_A = res_pin_trap_inner_A - trap_gap - 0.200  # :=> 1.45um	Design
+trap_pin_ratio = (
+                     res_pin_trap_inner_A * res_pin_trap_inner_ratio - trap_gap - 0.100) / trap_pin_A  # :=> 0.10344827586207	Design
+
 
 ### Userful Classes
 class half_res():
@@ -221,17 +263,17 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     MaskMaker.CPWStraight(s, 3000 - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300)
     MaskMaker.CPWTaper(s, 1, stop_pinw=.380, stop_gapw=.210)
     MaskMaker.CPWStraight(s, 4.5)
-    MaskMaker.CPWTaper(s, 1, stop_pinw=1.5, stop_gapw=1.5)
+    MaskMaker.CPWTaper(s, 1, stop_pinw=1.5, stop_gapw=(channel_W - 1.5) / 2)
     MaskMaker.CPWStraight(s, 10)
-    MaskMaker.CPWTaper(s, 3, stop_pinw=3.4, stop_gapw=1)
+    MaskMaker.CPWTaper(s, 3, stop_pinw=res_pin_W * 2 + res_center_gap_W, stop_gapw=res_gp_gap_W)
 
     # readout resonator on the right
     readout_resonator_start_pt = MaskMaker.translate_pt(c.center, (chip_resonator_length - 529.390 - 300, 0))
     c.s_readout = MaskMaker.Structure(c, start=readout_resonator_start_pt, direction=180)
     s = c.s_readout
-    s.pinw = 1.2
-    s.gapw = 1
-    s.center_gapw = 1
+    s.pinw = res_pin_W
+    s.gapw = res_gp_gap_W
+    s.center_gapw = res_center_gap_W
     MaskMaker.CoupledStraight(s, 50)
     MaskMaker.CoupledWiggles(s, 6, 1000, 0, start_up=True, radius=30,
                              segments=10)
@@ -316,7 +358,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
     ### Resonator Couplers
     c.two_layer = True
-    coupler_offset_v = 1.5 + 1.2 - 1.
+    coupler_offset_v = 1.5 + 1.2 - 1. - 0.73
     coupler_offset_h = 100
     launch_pt = MaskMaker.translate_pt(c.center, (coupler_offset_h, coupler_offset_v))
     setattr(c, 'resonator_coupler_1', MaskMaker.Structure(c, start=launch_pt, direction=90))
@@ -330,12 +372,12 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     coupler_2.pinw = 1.5
     coupler_2.gapw = 1.5
 
-    MaskMaker.CPWStraight(coupler_1, 50 - 0.75)
+    MaskMaker.CPWStraight(coupler_1, 50 - 0.75  + 0.730)
     MaskMaker.CPWBend(coupler_1, 90, radius=50, segments=12)
     MaskMaker.CPWStraight(coupler_1, chip_coupler_length)
     MaskMaker.CPWStraight(coupler_1, 1.5, pinw=0, gapw=4.5 / 2.)
 
-    MaskMaker.CPWStraight(coupler_2, 50 - 0.75)
+    MaskMaker.CPWStraight(coupler_2, 50 - 0.75 + 0.730)
     MaskMaker.CPWBend(coupler_2, -90, radius=50, segments=12)
     MaskMaker.CPWStraight(coupler_2, chip_coupler_length)
     MaskMaker.CPWStraight(coupler_2, 1.5, pinw=0, gapw=4.5 / 2.)
@@ -408,7 +450,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
 if __name__ == "__main__":
     ### define mask name, and open up an explorer window
-    MaskName = "M017V1"  # M006 Constriction Gate Resonator"
+    MaskName = "M018V1"  # M006 Constriction Gate Resonator"
 
     m = MaskMaker.WaferMask(MaskName, flat_angle=90., flat_distance=24100., wafer_padding=3.3e3, chip_size=(7000, 1900),
                             dicing_border=400, etchtype=False, wafer_edge=False,
@@ -422,11 +464,11 @@ if __name__ == "__main__":
                    (-18750., -21600.), (18750., -21600.)]
     MaskMaker.AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='gap', name='border_gap')
     MaskMaker.AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='pin', name='border_pin')
-    MaskMaker.AlphaNumText(m, text="DIS 160923", size=(400, 400), point=(7650, -19300), centered=True,
+    MaskMaker.AlphaNumText(m, text="DIS 161125", size=(400, 400), point=(7650, -19300), centered=True,
                            layer='gap')  # change the mask name/title here
-    MaskMaker.AlphaNumText(m, text="M017 Ge Yang", size=(400, 400), point=(7650, -18500), centered=True,
+    MaskMaker.AlphaNumText(m, text="M018 Ge Yang", size=(400, 400), point=(7650, -18500), centered=True,
                            layer='gap')  # change the mask name/title here
-    MaskMaker.AlphaNumText(m, text="DIS 160923 M017 Ge Yang", size=(700, 700), point=(0, 20500), centered=True,
+    MaskMaker.AlphaNumText(m, text="DIS 161125 M018 Ge Yang", size=(700, 700), point=(0, 20500), centered=True,
                            layer='gap')  # change the mask name/title here
 
     # m.randomize_layout()
