@@ -15,9 +15,12 @@ from termcolor import colored, cprint
 try:
     subprocess.Popen(r'taskkill /F /im "dwgviewr.exe"')
 except:
-    output = subprocess.check_output('ps aux | pgrep AutoCAD', shell=True)
-    print('kill -9 {}'.format(int(output.strip())))
-    subprocess.call('kill -9 {}'.format(int(output.strip())), shell=True)
+    try:
+        output = subprocess.check_output('ps aux | pgrep AutoCAD', shell=True)
+        print('kill -9 {}'.format(int(output.strip())))
+        subprocess.call('kill -9 {}'.format(int(output.strip())), shell=True)
+    except:
+        pass
 
 ### initialization    
 """ 
@@ -250,12 +253,13 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
     drive_pinw = channel_W - 2 * res_gp_gap_W
     drive_gapw = res_gp_gap_W
-    cprint(colored(drive_gapw, 'red'))
     MaskMaker.CPWTaper(c.s_drive, 50, pinw=3.4, gapw=1.0, stop_pinw=drive_pinw, stop_gapw=drive_gapw)
     MaskMaker.CPWStraight(c.s_drive, 2500 + 302.910 - 300 + 9.32 + 0.09 - 1.68 - 0.140)
     MaskMaker.CPWStraight(c.s_drive, trap_gap, pinw=trap_pin_W, gapw=(channel_W - trap_pin_W) / 2)
-    MaskMaker.ThreePinTaper(c.s_drive, 6.500, pinw=res_pin_W - trap_pin_W / 2, center_pinw=trap_pin_W, center_gapw=trap_gap)
-    MaskMaker.CoupledStraight(c.s_drive, trap_gap, gapw=(channel_W - trap_pin_W) / 2 - trap_gap, center_gapw=trap_gap * 2 + trap_pin_W)
+    MaskMaker.ThreePinTaper(c.s_drive, 6.500, pinw=res_pin_W - trap_pin_W / 2, center_pinw=trap_pin_W,
+                            center_gapw=trap_gap)
+    MaskMaker.CoupledStraight(c.s_drive, trap_gap, gapw=(channel_W - trap_pin_W) / 2 - trap_gap,
+                              center_gapw=trap_gap * 2 + trap_pin_W)
 
     ### Right launchers and the readout resonator
 
@@ -315,8 +319,10 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     mid_pt = MaskMaker.translate_pt(MaskMaker.middle(c.s1.last, c.s2.last), (-300, 0))
     s.last = mid_pt
     MaskMaker.Ellipses(s.gap_layer, mid_pt, trap_L / 2, trap_W / 2, 0, 20)
-    MaskMaker.Ellipses(s.pin_layer, mid_pt, res_pin_trap_outer_A * res_pin_trap_outer_ratio, res_pin_trap_outer_A, 0, 20)
-    MaskMaker.Ellipses(s.pin_layer, mid_pt, res_pin_trap_inner_A * res_pin_trap_inner_ratio, res_pin_trap_inner_A, 0, 20)
+    MaskMaker.Ellipses(s.pin_layer, mid_pt, res_pin_trap_outer_A * res_pin_trap_outer_ratio, res_pin_trap_outer_A, 0,
+                       20)
+    MaskMaker.Ellipses(s.pin_layer, mid_pt, res_pin_trap_inner_A * res_pin_trap_inner_ratio, res_pin_trap_inner_A, 0,
+                       20)
     MaskMaker.Ellipses(s.pin_layer, mid_pt, trap_pin_A * trap_pin_ratio, trap_pin_A, 0, 20)
 
     s.chip.two_layer = True
@@ -497,7 +503,7 @@ if __name__ == "__main__":
     solid = True
 
     for i, resonator_length in enumerate([2440 * 0.9, 2140 * 0.9, 1900 * 0.9]):
-        for j, coupler_length in enumerate([50, 45, 40]):
+        for j, coupler_length in enumerate([50 * 1.75, 45 * 1.75, 40 * 1.75]):
             chip_name = 'YggdrasilV1r{}c{}'.format(i + 1, j + 1)
             print('chip name: ', chip_name)
             c = MaskMaker.Chip(chip_name, author='GeYang', size=m.chip_size, mask_id_loc=(5050, 1720),
