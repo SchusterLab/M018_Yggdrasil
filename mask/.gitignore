@@ -5,6 +5,4 @@ MaskMaker
 
 
 # AutoCAD work files
-*.dwl
-*.dwl2
-*.dwl*
+*.dw*
