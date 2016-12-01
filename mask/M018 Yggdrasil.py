@@ -4,9 +4,9 @@ Created on Tue Sep 26 16:51:11 2016
 @author: Ge Yang
 """
 
-from MaskMaker import MaskMaker as MaskMaker, Utilities as mask_utils
+from MaskMaker import MaskMaker as MaskMaker, Utilities as mask_utils, sdxf
 
-import os
+import os, numpy as np
 import subprocess
 from time import sleep
 from termcolor import colored, cprint
@@ -248,15 +248,22 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     # drive resonator from the left
     drive_resonator_start_pt = MaskMaker.middle(c.sl1.last, c.sl2.last)
     c.s_drive = MaskMaker.Structure(c, start=drive_resonator_start_pt, direction=0)
+    print(c.s_drive.start)
     MaskMaker.CoupledTaper(c.s_drive, 6, pinw=c.sl1.pinw, gapw=c.sl1.gapw, center_gapw=8, stop_pinw=1.2, stop_gapw=1,
                            stop_center_gapw=1)
 
     drive_pinw = channel_W - 2 * res_gp_gap_W
     drive_gapw = res_gp_gap_W
+    three_pin_L = (6.500 - 2 * res_pin_trap_inner_A * res_pin_trap_inner_ratio)/2
+
     MaskMaker.CPWTaper(c.s_drive, 50, pinw=3.4, gapw=1.0, stop_pinw=drive_pinw, stop_gapw=drive_gapw)
     MaskMaker.CPWStraight(c.s_drive, 2500 + 302.910 - 300 + 9.32 + 0.09 - 1.68 - 0.140)
     MaskMaker.CPWStraight(c.s_drive, trap_gap, pinw=trap_pin_W, gapw=(channel_W - trap_pin_W) / 2)
-    MaskMaker.ThreePinTaper(c.s_drive, 6.500, pinw=res_pin_W - trap_pin_W / 2, center_pinw=trap_pin_W,
+    MaskMaker.ThreePinTaper(c.s_drive, three_pin_L, pinw=res_pin_W - trap_pin_W / 2, center_pinw=trap_pin_W,
+                            center_gapw=trap_gap)
+    MaskMaker.CPWStraight(c.s_drive, 2 * res_pin_trap_inner_A * res_pin_trap_inner_ratio, pinw=trap_pin_W,
+                          gapw=(channel_W - trap_pin_W) / 2)
+    MaskMaker.ThreePinTaper(c.s_drive, three_pin_L, pinw=res_pin_W - trap_pin_W / 2, center_pinw=trap_pin_W,
                             center_gapw=trap_gap)
     MaskMaker.CoupledStraight(c.s_drive, trap_gap, gapw=(channel_W - trap_pin_W) / 2 - trap_gap,
                               center_gapw=trap_gap * 2 + trap_pin_W)
@@ -318,12 +325,25 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
 
     mid_pt = MaskMaker.translate_pt(MaskMaker.middle(c.s1.last, c.s2.last), (-300, 0))
     s.last = mid_pt
-    MaskMaker.Ellipses(s.gap_layer, mid_pt, trap_L / 2, trap_W / 2, 0, 20)
-    MaskMaker.Ellipses(s.pin_layer, mid_pt, res_pin_trap_outer_A * res_pin_trap_outer_ratio, res_pin_trap_outer_A, 0,
-                       20)
-    MaskMaker.Ellipses(s.pin_layer, mid_pt, res_pin_trap_inner_A * res_pin_trap_inner_ratio, res_pin_trap_inner_A, 0,
-                       20)
-    MaskMaker.Ellipses(s.pin_layer, mid_pt, trap_pin_A * trap_pin_ratio, trap_pin_A, 0, 20)
+    theta2 = np.arcsin(0.70 / (2*res_pin_trap_outer_A))
+    theta3 = np.arcsin(0.70 / (2*res_pin_trap_inner_A))
+
+    outer_arc = MaskMaker.ellipse_arcpts(mid_pt, res_pin_trap_outer_A * res_pin_trap_outer_ratio, res_pin_trap_outer_A,
+                                         angle_start=theta2, angle_stop=np.pi-theta2, angle=0, segments=10)
+    inner_arc = MaskMaker.ellipse_arcpts(mid_pt, res_pin_trap_inner_A * res_pin_trap_inner_ratio, res_pin_trap_inner_A,
+                                         angle_start=np.pi-theta3, angle_stop=theta3, angle=0, segments=10)
+
+    for ia in inner_arc:
+        outer_arc.append(ia)
+    outer_arc.append(outer_arc[0])
+    s.pin_layer.append(sdxf.PolyLine(outer_arc))
+
+    # And mirror the trap
+    mirrored_outer_arc = MaskMaker.mirror_pts(outer_arc, axis_angle=0, axis_pt=mid_pt)
+    s.pin_layer.append(sdxf.PolyLine(mirrored_outer_arc))
+
+    MaskMaker.Ellipses(s.gap_layer, mid_pt, trap_L / 2, trap_W / 2, angle=0, segments=20)
+    MaskMaker.Ellipses(s.pin_layer, mid_pt, trap_pin_A * trap_pin_ratio, trap_pin_A, angle=0, segments=20)
 
     s.chip.two_layer = True
 
