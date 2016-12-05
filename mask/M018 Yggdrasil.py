@@ -329,9 +329,9 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     theta3 = np.arcsin(0.70 / (2*res_pin_trap_inner_A))
 
     outer_arc = MaskMaker.ellipse_arcpts(mid_pt, res_pin_trap_outer_A * res_pin_trap_outer_ratio, res_pin_trap_outer_A,
-                                         angle_start=theta2, angle_stop=np.pi-theta2, angle=0, segments=10)
+                                         angle_start=theta2, angle_stop=np.pi-theta2, angle=0, segments=7)
     inner_arc = MaskMaker.ellipse_arcpts(mid_pt, res_pin_trap_inner_A * res_pin_trap_inner_ratio, res_pin_trap_inner_A,
-                                         angle_start=np.pi-theta3, angle_stop=theta3, angle=0, segments=10)
+                                         angle_start=np.pi-theta3, angle_stop=theta3, angle=0, segments=7)
 
     for ia in inner_arc:
         outer_arc.append(ia)
@@ -342,8 +342,8 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None):
     mirrored_outer_arc = MaskMaker.mirror_pts(outer_arc, axis_angle=0, axis_pt=mid_pt)
     s.pin_layer.append(sdxf.PolyLine(mirrored_outer_arc))
 
-    MaskMaker.Ellipses(s.gap_layer, mid_pt, trap_L / 2, trap_W / 2, angle=0, segments=20)
-    MaskMaker.Ellipses(s.pin_layer, mid_pt, trap_pin_A * trap_pin_ratio, trap_pin_A, angle=0, segments=20)
+    MaskMaker.Ellipses(s.gap_layer, mid_pt, trap_L / 2, trap_W / 2, angle=0, segments=14)
+    MaskMaker.Ellipses(s.pin_layer, mid_pt, trap_pin_A * trap_pin_ratio, trap_pin_A, angle=0, segments=14)
 
     s.chip.two_layer = True
 
