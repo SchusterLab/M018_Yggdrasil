@@ -525,17 +525,17 @@ if __name__ == "__main__":
     two_layer = True
     solid = True
 
-    resonator_length = 2140 * 0.9
-    for i, has_bubble_gum in enumerate([False, True]):
+    for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.33]):
         for j, coupler_length in enumerate([35, 35 * 1.5]):
-            chip_name = 'YggdrasilV2c{}{}'.format(j + 1, 'b' if has_bubble_gum else "")
-            print('chip name: ', chip_name)
-            c = MaskMaker.Chip(chip_name, author='GeYang', size=m.chip_size, mask_id_loc=(5050, 1720),
-                               chip_id_loc=(4540, 100), two_layer=two_layer, solid=solid, segments=10)
-            c.textsize = (80, 80)
-            chipDrw_1(c, chip_resonator_length=resonator_length, chip_coupler_length=coupler_length, d=d,
-                      inductive_launcher=has_bubble_gum)
-            m.add_chip(c, 1)
+            for k, has_bubble_gum in enumerate([False, True]):
+                chip_name = 'YggdrasilV2r{}c{}{}'.format(i, j + 1, 'b' if has_bubble_gum else "")
+                print('chip name: ', chip_name)
+                c = MaskMaker.Chip(chip_name, author='GeYang', size=m.chip_size, mask_id_loc=(5050, 1720),
+                                   chip_id_loc=(4540, 100), author_loc=(6900 - 120, 100), two_layer=two_layer, solid=solid, segments=10)
+                c.textsize = (80, 80)
+                chipDrw_1(c, chip_resonator_length=resonator_length, chip_coupler_length=coupler_length, d=d,
+                          inductive_launcher=has_bubble_gum)
+                m.add_chip(c, 1)
 
     m.save()
     ### Check and open the folder
