@@ -525,7 +525,7 @@ if __name__ == "__main__":
     two_layer = True
     solid = True
 
-    for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.33]):
+    for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.4]):
         for j, coupler_length in enumerate([35, 35 * 1.5]):
             for k, has_bubble_gum in enumerate([False, True]):
                 chip_name = 'YggdrasilV2r{}c{}{}'.format(i, j + 1, 'b' if has_bubble_gum else "")
