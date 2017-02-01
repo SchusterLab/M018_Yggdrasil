@@ -4,7 +4,7 @@ Created on Tue Sep 26 16:51:11 2016
 @author: Ge Yang
 """
 
-from MaskMaker import MaskMaker as MaskMaker, Utilities as mask_utils, sdxf
+from lib.MaskMaker import MaskMaker as MaskMaker, Utilities as mask_utils, sdxf
 
 import os, numpy as np
 import subprocess
@@ -375,7 +375,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
 
     R1 = 60
     L1 = 0
-    L2 = 200 + 39.6475 - 0.5
+    L2 = 200 + 39.6475 - 0.8
     L3 = 199.5 - 0.0013 - 120 - 40 - 40
     L4 = 100
     L5 = 100 + 0.6275 - 3 # to make it 30 um away from the resonator
@@ -535,7 +535,7 @@ if __name__ == "__main__":
     solid = True
 
     for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.42]):
-        for j, coupler_length in enumerate([25, 40]):
+        for j, coupler_length in enumerate([40, 60]):
             for k, has_bubble_gum in enumerate([False, True]):
                 chip_name = 'r{}c{}{}'.format(i + 1, j + 1, 'b' if has_bubble_gum else "")
                 print('chip name: ', chip_name)
