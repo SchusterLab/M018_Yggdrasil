@@ -160,7 +160,7 @@ def chipInit(c, defaults):
     setattr(c, 's20', MaskMaker.Structure(c, start=c.bottom_right_mid_right, direction=90, defaults=defaults))
     MaskMaker.FineAlign(c, al=25, mark_type='box')
 
-    alignment1 = MaskMaker.Structure(c, start=(c.top_midpt[0]-1400, c.top_midpt[1]-60), layer='gap')
+    alignment1 = MaskMaker.Structure(c, start=(c.top_midpt[0] - 1400, c.top_midpt[1] - 60), layer='gap')
     alignment2 = MaskMaker.Structure(c, start=(c.bottom_midpt[0] - 1400, c.bottom_midpt[1] + 60), layer='gap')
     alignment3 = MaskMaker.Structure(c, start=(c.bottom_midpt[0] + 1400, c.bottom_midpt[1] + 60), layer='gap')
     alignment4 = MaskMaker.Structure(c, start=(c.top_midpt[0] + 1400, c.top_midpt[1] - 60), layer='gap')
@@ -378,7 +378,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     L2 = 200 + 39.6475 - 0.8
     L3 = 199.5 - 0.0013 - 120 - 40 - 40
     L4 = 100
-    L5 = 100 + 0.6275 - 3 # to make it 30 um away from the resonator
+    L5 = 100 + 0.6275 - 3  # to make it 30 um away from the resonator
 
     s = c.s15
     s.chip.two_layer = False
@@ -534,13 +534,14 @@ if __name__ == "__main__":
     two_layer = True
     solid = True
 
-    for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.42]):
-        for j, coupler_length in enumerate([40, 60]):
+    for i, resonator_length in enumerate([2140 * 0.9 * 1.666, 2140 * 0.9 * 1.42 * 1.666]):
+        for j, coupler_length in enumerate([40 * 2, 60 * 2]):
             for k, has_bubble_gum in enumerate([False, True]):
                 chip_name = 'r{}c{}{}'.format(i + 1, j + 1, 'b' if has_bubble_gum else "")
                 print('chip name: ', chip_name)
                 c = MaskMaker.Chip(chip_name, author='GeYang', size=m.chip_size, mask_id_loc=(1300, 1720),
-                                   chip_id_loc=(1300, 100), author_loc=(6900 - 120, 100), two_layer=two_layer, solid=solid, segments=10)
+                                   chip_id_loc=(1300, 100), author_loc=(6900 - 120, 100), two_layer=two_layer,
+                                   solid=solid, segments=10)
                 c.textsize = (80, 80)
                 chipDrw_1(c, chip_resonator_length=resonator_length, chip_coupler_length=coupler_length, d=d,
                           inductive_launcher=has_bubble_gum)
