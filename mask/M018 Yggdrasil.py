@@ -4,7 +4,7 @@ Created on Tue Sep 26 16:51:11 2016
 @author: Ge Yang
 """
 
-from lib.MaskMaker import MaskMaker as MaskMaker, Utilities as mask_utils, sdxf
+from MaskMaker import MaskMaker as MaskMaker, Utilities as mask_utils, sdxf
 
 import os, numpy as np
 import subprocess
@@ -290,8 +290,13 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
         MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
         MaskMaker.CPWStraight(s, 245)
 
+    wiggle_length = 3000
+
+    right_launcher_straight = 2000 + wiggle_length - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300
+    cprint("right_launcher_straight: {}".format(right_launcher_straight), color="red")
+
     MaskMaker.CPWTaper(s, 80, stop_pinw=1.5, stop_gapw=1.5)
-    MaskMaker.CPWStraight(s, 3000 - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300)
+    MaskMaker.CPWStraight(s, right_launcher_straight)
     MaskMaker.CPWTaper(s, 1, stop_pinw=1.5, stop_gapw=.72)
     MaskMaker.CPWStraight(s, 4.5)
     MaskMaker.CPWTaper(s, 1, stop_pinw=1.5, stop_gapw=(channel_W - 1.5) / 2)
@@ -299,16 +304,20 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     MaskMaker.CPWTaper(s, 3, stop_pinw=res_pin_W * 2 + res_center_gap_W, stop_gapw=res_gp_gap_W)
 
     # readout resonator on the right
-    readout_resonator_start_pt = MaskMaker.translate_pt(c.center, (chip_resonator_length - 529.390 - 300, 0))
+    readout_resonator_start_pt = MaskMaker.translate_pt(c.center, (
+        chip_resonator_length - 529.390 - 300 + 1000 - wiggle_length, 0))
     c.s_readout = MaskMaker.Structure(c, start=readout_resonator_start_pt, direction=180)
     s = c.s_readout
     s.pinw = res_pin_W
     s.gapw = res_gp_gap_W
     s.center_gapw = res_center_gap_W
     MaskMaker.CoupledStraight(s, 50)
-    MaskMaker.CoupledWiggles(s, 6, 1000, 0, start_up=True, radius=30,
+
+    wiggle_right_length = resonator_length - wiggle_length - 1 - 1.16 + 1.27 - 1.86 - 0.1400
+
+    MaskMaker.CoupledWiggles(s, 6, wiggle_length, 0, start_up=True, radius=30,
                              segments=30)
-    MaskMaker.CoupledStraight(s, resonator_length - 1000 - 1 - 1.16 + 1.27 - 1.86 - 0.1400)
+    MaskMaker.CoupledStraight(s, wiggle_right_length)
 
     # if not hasattr(s, 'gap_layer') and not hasattr(s, 'pin_layer'):
     #     MaskMaker.CPWStraight(s, .1225, pinw=0, gapw=.22 / 2.)
@@ -373,12 +382,13 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
 
     ### Microwave Feed Couplers
 
+    coupler_offset = 15
     R1 = 60
     L1 = 0
     L2 = 200 + 39.6475 - 0.8
     L3 = 199.5 - 0.0013 - 120 - 40 - 40
     L4 = 100
-    L5 = 100 + 0.6275 - 3  # to make it 30 um away from the resonator
+    L5 = 150 - coupler_offset + 0.6275 - 3  # to make it `coupler_offset` um away from the resonator
 
     s = c.s15
     s.chip.two_layer = False
@@ -423,10 +433,10 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     coupler_2.pinw = 1.2
     coupler_2.gapw = res_coupler_gap
 
-    MaskMaker.CPWStraight(coupler_1, 50 - 0.75 + 0.730 - 3.2822 + coupler_length + 6 - .6978)
+    MaskMaker.CPWStraight(coupler_1, coupler_offset - 0.75 + 0.730 - 3.2822 + chip_coupler_length + 6 - .6978)
     MaskMaker.CPWStraight(coupler_1, 1.5, pinw=0, gapw=end_cap_gap)
 
-    MaskMaker.CPWStraight(coupler_2, 50 - 0.75 + 0.730 - 3.2822 + coupler_length + 6 - .6978)
+    MaskMaker.CPWStraight(coupler_2, coupler_offset - 0.75 + 0.730 - 3.2822 + chip_coupler_length + 6 - .6978)
     MaskMaker.CPWStraight(coupler_2, 1.5, pinw=0, gapw=end_cap_gap)
 
     ### DC Guards
@@ -484,7 +494,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     # Resonator DC Bias pinch electrodes
     L1 = 20
     R = 20
-    L3 = - (resonator_length - 1900) + 1450 - 40 - 36.86 + 0.15
+    L3 = - (resonator_length - 900 - wiggle_length) + 1450 - 40 - 36.86 + 0.15
     L5 = 4
     L6 = 2
     L4 = 450 - 40 - L1 - 0.4 - 1.070 - L5 - L6
@@ -506,7 +516,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
 
 if __name__ == "__main__":
     ### define mask name, and open up an explorer window
-    MaskName = "M018V2"  # M006 Constriction Gate Resonator"
+    MaskName = "M018V3"  # M006 Constriction Gate Resonator"
 
     m = MaskMaker.WaferMask(MaskName, flat_angle=90., flat_distance=24100., wafer_padding=3.3e3, chip_size=(7000, 1900),
                             dicing_border=400, etchtype=False, wafer_edge=False,
@@ -534,6 +544,7 @@ if __name__ == "__main__":
     two_layer = True
     solid = True
 
+    # for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.42]):
     for i, resonator_length in enumerate([2140 * 0.9 * 1.666, 2140 * 0.9 * 1.42 * 1.666]):
         for j, coupler_length in enumerate([40 * 2, 60 * 2]):
             for k, has_bubble_gum in enumerate([False, True]):
