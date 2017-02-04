@@ -546,7 +546,7 @@ if __name__ == "__main__":
 
     # for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.42]):
     for i, resonator_length in enumerate([2140 * 0.9 * 1.666, 2140 * 0.9 * 1.42 * 1.666]):
-        for j, coupler_length in enumerate([40 * 2, 60 * 2]):
+        for j, coupler_length in enumerate([40 * 2, 60 * 2, 100]):
             for k, has_bubble_gum in enumerate([False, True]):
                 chip_name = 'r{}c{}{}'.format(i + 1, j + 1, 'b' if has_bubble_gum else "")
                 print('chip name: ', chip_name)
