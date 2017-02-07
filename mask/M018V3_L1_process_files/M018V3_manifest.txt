@@ -1,0 +1,98 @@
+Mask:	M018V3	Total Chips:	12
+ID	Copies	Short Description	Chip Type	Chip Info
+R1C1	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R1C1B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R1C2	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R1C2B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R1C3	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R1C3B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R2C1	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R2C1B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R2C2	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R2C2B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R2C3	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R2C3B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+______________________
+R1C1	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R1C1B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R1C2	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R1C2B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R1C3	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R1C3B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R2C1	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R2C1B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R2C2	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R2C2B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R2C3	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R2C3B	1	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
