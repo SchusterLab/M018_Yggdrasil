@@ -264,10 +264,11 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     drive_pinw = channel_W - 2 * res_gp_gap_W
     drive_gapw = res_gp_gap_W
     padding_to_connect_to_ellipse = trap_gap
-    three_pin_L = trap_guard_L + trap_gap * 2 + padding_to_connect_to_ellipse
+    three_pin_L = trap_guard_L + trap_gap + padding_to_connect_to_ellipse
 
     MaskMaker.CPWTaper(c.s_drive, 50, pinw=3.4, gapw=1.0, stop_pinw=drive_pinw, stop_gapw=drive_gapw)
-    MaskMaker.CPWStraight(c.s_drive, 2500 + 302.910 - 300 + 9.32 + 0.09 - 1.68 - 0.140 + 0.75 + guard_gap + trap_guard_L)
+    MaskMaker.CPWStraight(c.s_drive,
+                          2500 + 302.910 - 300 + 9.32 + 0.09 - 1.68 - 0.140 + 0.75 + 2 * guard_gap + trap_guard_L)
 
     # trap area
     # gapw is always res_gp_gap_W
@@ -293,7 +294,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
         MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
         MaskMaker.CPWStraight(s, 245)
 
-    right_launcher_straight = 2000 + wiggle_length - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300 + 0.75 + trap_guard_L + trap_gap
+    right_launcher_straight = 2000 + wiggle_length - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300 + 0.75 + guard_gap * 2 + trap_guard_L
     # cprint("right_launcher_straight: {}".format(right_launcher_straight), color="red")
 
     MaskMaker.CPWTaper(s, 80, stop_pinw=1.5, stop_gapw=1.5)
@@ -306,7 +307,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
 
     # resonator (on the right)
     readout_resonator_start_pt = MaskMaker.translate_pt(c.center, (
-        chip_resonator_length - 529.390 - 300 + 1000 - wiggle_length - 0.75 - trap_guard_L - trap_gap, 0))
+        chip_resonator_length - 529.390 - 300 + 1000 - wiggle_length - 0.75 - 2 * guard_gap - trap_guard_L, 0))
     c.s_readout = MaskMaker.Structure(c, start=readout_resonator_start_pt, direction=180)
     s = c.s_readout
     s.pinw = res_pin_W
@@ -386,16 +387,16 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     coupler_offset = 15
     R1 = 60
     L1 = 0
-    L2 = 200 + 39.6475 - 0.8
+    coupler_offset_h = 00 + 39.6475 - 0.8
     L3 = 199.5 - 0.0013 - 120 - 40 - 40
-    L5 = 27.2513 + 150 + 150 - coupler_offset # to make it `coupler_offset` um away from the resonator
+    L5 = 27.2513 + 150 + 150 - coupler_offset  # to make it `coupler_offset` um away from the resonator
 
     s = c.s15
     s.chip.two_layer = False
     s.pinw = 3
     s.gapw = 1
     MaskMaker.Launcher(s)
-    MaskMaker.CPWSturn(s, L1, -90, R1, L2, 90, R1, L3, segments=5)
+    MaskMaker.CPWSturn(s, L1, -90, R1, coupler_offset_h, 90, R1, L3, segments=5)
     MaskMaker.CPWStraight(s, L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
@@ -404,7 +405,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     s.pinw = 3
     s.gapw = 1
     MaskMaker.Launcher(s)
-    MaskMaker.CPWSturn(s, L1, 90, R1, L2, -90, R1, L3, segments=5)
+    MaskMaker.CPWSturn(s, L1, 90, R1, coupler_offset_h, -90, R1, L3, segments=5)
     MaskMaker.CPWStraight(s, L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
@@ -412,7 +413,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     c.two_layer = True
     coupler_spacing = 0.8
     coupler_offset_v = 1.5 + 1.2 - 1. - 0.73
-    coupler_offset_h = 262.4025 - coupler_spacing
+    coupler_offset_h = 462.4025 - coupler_spacing
     launch_pt = MaskMaker.translate_pt(c.center, (coupler_offset_h, coupler_offset_v))
     setattr(c, 'resonator_coupler_1', MaskMaker.Structure(c, start=launch_pt, direction=90))
     launch_pt = MaskMaker.translate_pt(c.center, (coupler_offset_h, -coupler_offset_v))
@@ -490,7 +491,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     # Resonator DC Bias pinch electrodes
     L1 = 20
     R = 20
-    L3 = - (resonator_length - 900 - wiggle_length) + 1450 - 40 - 36.86 + 0.15 + 1.5 +  - 0.15
+    L3 = - (resonator_length - 900 - wiggle_length) + 1450 - 40 - 36.86 + 0.15 + 1.5 + - 0.15 + guard_gap
     L5 = 4
     L6 = 2
     L4 = 450 - 40 - L1 - 0.4 - 1.070 - L5 - L6
