@@ -12,15 +12,15 @@ from time import sleep
 from termcolor import colored, cprint
 
 ### Close DWG Viewer
-try:
-    subprocess.Popen(r'taskkill /F /im "dwgviewr.exe"')
-except:
-    try:
-        output = subprocess.check_output('ps aux | pgrep AutoCAD', shell=True)
-        print('kill -9 {}'.format(int(output.strip())))
-        subprocess.call('kill -9 {}'.format(int(output.strip())), shell=True)
-    except:
-        pass
+# try:
+#     subprocess.Popen(r'taskkill /F /im "dwgviewr.exe"')
+# except:
+#     try:
+#         output = subprocess.check_output('ps aux | pgrep AutoCAD', shell=True)
+#         print('kill -9 {}'.format(int(output.strip())))
+#         subprocess.call('kill -9 {}'.format(int(output.strip())), shell=True)
+#     except:
+#         pass
 
 ### initialization
 """
@@ -46,12 +46,12 @@ box_W = 20  # um :=> 20um	Design
 box_L = 60  # um :=> 60um	Design
 end_cap_L = 1  # um :=> 1um	Design
 guard_extra_W = 0 * nm  # nm :=> 0nm	Design
-trap_guard_L = 1.5  # :=> um	1.5um	Design
-res_pin_W = 720 * nm  # nm :=> 720nm	Design
-res_center_gap_W = 500 * nm  # nm :=> 500nm	Design
+trap_guard_L = 0.5  # :=> um	1.5um	Design
+res_pin_W = 900 * nm  # nm :=> 720nm	Design
+res_center_gap_W = 700 * nm  # nm :=> 500nm	Design
 res_gp_gap_W = 500 * nm  # nm :=> 500nm	Design
 trap_W = 8  # um :=> 8um	Design
-trap_L = 3  # um :=> 3um	Design
+trap_L = 1.5  # um :=> 3um	Design
 trap_ratio = trap_L / trap_W  # :=> 0.375	Design
 trap_gap = 250 * nm  # nm :=> 250nm	Design
 trap_pin_W = 200 * nm  # nm :=> 200nm	Design
@@ -62,14 +62,14 @@ guard_W = box_W / 2 - channel_W / 2 + guard_extra_W  # :=> 8.53um	Design
 ground_Y0 = center_guard_L / 2 + guard_gap * 2 + trap_guard_L  # :=> 3.5um	Design
 trap_pin_Y0 = -(center_guard_L / 2 + guard_gap + trap_guard_L)  # :=> -3.25um	Design
 res_pin_Y0 = -trap_pin_Y0  # :=> 3.25e-006	Design
-res_pin_trap_outer_A = trap_W / 2 - trap_gap - 400 * nm  # nm # :=> 3.35um	Design
-res_pin_trap_outer_ratio = (trap_L / 2 - trap_gap - 0.200) / res_pin_trap_outer_A  # :=> 0.3134328358209	Design
-res_pin_trap_inner_A = res_pin_trap_outer_A - trap_gap - 1.200  # :=> 1.9um	Design
+res_pin_trap_outer_A = trap_W / 2 - trap_gap - 1000 * nm  # nm # :=> 3.35um	Design
+res_pin_trap_outer_ratio = (trap_L / 2 - trap_gap + 100 * nm) / res_pin_trap_outer_A  # :=> 0.3134328358209	Design
+res_pin_trap_inner_A = res_pin_trap_outer_A - trap_gap - 800 * nm  # :=> 1.9um	Design
 res_pin_trap_inner_ratio = (
-                               res_pin_trap_outer_A * res_pin_trap_outer_ratio - trap_gap - 0.300) / res_pin_trap_inner_A  # :=> 0.26315789473684	Design
-trap_pin_A = res_pin_trap_inner_A - trap_gap - 0.200  # :=> 1.45um	Design
+                               res_pin_trap_outer_A * res_pin_trap_outer_ratio - trap_gap - 20 * nm) / res_pin_trap_inner_A  # :=> 0.26315789473684	Design
+trap_pin_A = res_pin_trap_inner_A - trap_gap - 200 * nm  # :=> 1.45um	Design
 trap_pin_ratio = (
-                     res_pin_trap_inner_A * res_pin_trap_inner_ratio - trap_gap - 0.100) / trap_pin_A  # :=> 0.10344827586207	Design
+                     res_pin_trap_inner_A * res_pin_trap_inner_ratio - trap_gap + 80 * nm) / trap_pin_A  # :=> 0.10344827586207	Design
 
 
 ### Userful Classes
@@ -170,7 +170,7 @@ def chipInit(c, defaults):
     MaskMaker.BoxShapeAlignmentMarks(alignment4, 2, 25, layer='gap')
 
 
-def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_launcher=False):
+def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=None, inductive_launcher=False):
     ### Chip Init
     # gapw=calculate_gap_width(eps_eff,50,pinw)
 
@@ -257,25 +257,28 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     # drive resonator from the left
     drive_resonator_start_pt = MaskMaker.middle(c.sl1.last, c.sl2.last)
     c.s_drive = MaskMaker.Structure(c, start=drive_resonator_start_pt, direction=0)
-    print(c.s_drive.start)
+
     MaskMaker.CoupledTaper(c.s_drive, 6, pinw=c.sl1.pinw, gapw=c.sl1.gapw, center_gapw=8, stop_pinw=1.2, stop_gapw=1,
                            stop_center_gapw=1)
 
     drive_pinw = channel_W - 2 * res_gp_gap_W
     drive_gapw = res_gp_gap_W
-    three_pin_L = (6.500 - 2 * res_pin_trap_inner_A * res_pin_trap_inner_ratio) / 2
+    padding_to_connect_to_ellipse = trap_gap
+    three_pin_L = trap_guard_L + trap_gap * 2 + padding_to_connect_to_ellipse
 
     MaskMaker.CPWTaper(c.s_drive, 50, pinw=3.4, gapw=1.0, stop_pinw=drive_pinw, stop_gapw=drive_gapw)
-    MaskMaker.CPWStraight(c.s_drive, 2500 + 302.910 - 300 + 9.32 + 0.09 - 1.68 - 0.140)
+    MaskMaker.CPWStraight(c.s_drive, 2500 + 302.910 - 300 + 9.32 + 0.09 - 1.68 - 0.140 + 0.75 + guard_gap + trap_guard_L)
+
+    # trap area
+    # gapw is always res_gp_gap_W
     MaskMaker.CPWStraight(c.s_drive, trap_gap, pinw=trap_pin_W, gapw=(channel_W - trap_pin_W) / 2)
-    MaskMaker.ThreePinTaper(c.s_drive, three_pin_L, pinw=res_pin_W - trap_pin_W / 2, center_pinw=trap_pin_W,
+    MaskMaker.ThreePinTaper(c.s_drive, three_pin_L, pinw=res_pin_W, center_pinw=trap_pin_W, gapw=res_gp_gap_W,
                             center_gapw=trap_gap)
-    MaskMaker.CPWStraight(c.s_drive, 2 * res_pin_trap_inner_A * res_pin_trap_inner_ratio, pinw=trap_pin_W,
+    MaskMaker.CPWStraight(c.s_drive, trap_L - padding_to_connect_to_ellipse * 2, pinw=trap_pin_W,
                           gapw=(channel_W - trap_pin_W) / 2)
-    MaskMaker.ThreePinTaper(c.s_drive, three_pin_L, pinw=res_pin_W - trap_pin_W / 2, center_pinw=trap_pin_W,
+    MaskMaker.ThreePinTaper(c.s_drive, three_pin_L, pinw=res_pin_W, center_pinw=trap_pin_W, gapw=res_gp_gap_W,
                             center_gapw=trap_gap)
-    MaskMaker.CoupledStraight(c.s_drive, trap_gap, gapw=(channel_W - trap_pin_W) / 2 - trap_gap,
-                              center_gapw=trap_gap * 2 + trap_pin_W)
+    MaskMaker.CoupledStraight(c.s_drive, trap_gap, center_gapw=trap_gap * 2 + trap_pin_W)
 
     ### Right launchers and the readout resonator
 
@@ -290,10 +293,8 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
         MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
         MaskMaker.CPWStraight(s, 245)
 
-    wiggle_length = 3000
-
-    right_launcher_straight = 2000 + wiggle_length - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300
-    cprint("right_launcher_straight: {}".format(right_launcher_straight), color="red")
+    right_launcher_straight = 2000 + wiggle_length - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300 + 0.75 + trap_guard_L + trap_gap
+    # cprint("right_launcher_straight: {}".format(right_launcher_straight), color="red")
 
     MaskMaker.CPWTaper(s, 80, stop_pinw=1.5, stop_gapw=1.5)
     MaskMaker.CPWStraight(s, right_launcher_straight)
@@ -303,9 +304,9 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     MaskMaker.CPWStraight(s, 10)
     MaskMaker.CPWTaper(s, 3, stop_pinw=res_pin_W * 2 + res_center_gap_W, stop_gapw=res_gp_gap_W)
 
-    # readout resonator on the right
+    # resonator (on the right)
     readout_resonator_start_pt = MaskMaker.translate_pt(c.center, (
-        chip_resonator_length - 529.390 - 300 + 1000 - wiggle_length, 0))
+        chip_resonator_length - 529.390 - 300 + 1000 - wiggle_length - 0.75 - trap_guard_L - trap_gap, 0))
     c.s_readout = MaskMaker.Structure(c, start=readout_resonator_start_pt, direction=180)
     s = c.s_readout
     s.pinw = res_pin_W
@@ -324,7 +325,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
 
     # Center Guard
     length_to_trap = 450 - 5 - 10
-    guard_straight = 185.51 - 1.351
+    guard_straight = 185.51 - 1.351 - 0.28
     center_guard_taper = 5
     guard_middle_pinch_length = 4 + 0.371
     guardSHorizontal = 445. - 300
@@ -378,7 +379,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     guardLauncherStraight = 145 + 1.3759 + 0.3750 - 5.5461
     guardSHorizontal = 360 + 12.68 + 1.277 + 0.0707 - 0.220 - 0.0670 - 0.290 - 0.07
     guardEndStraight = 120 + 20.7 + 2 + 2
-    sideGuardEndStraight = 1.0 + 3.9897 + 0.255 - 0.12 - 0.25 - 1.350 + 0.37
+    sideGuardEndStraight = 1.0 + 3.9897 + 0.255 - 0.12 - 0.25 - 1.350 + 0.37 - 0.28
 
     ### Microwave Feed Couplers
 
@@ -387,8 +388,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     L1 = 0
     L2 = 200 + 39.6475 - 0.8
     L3 = 199.5 - 0.0013 - 120 - 40 - 40
-    L4 = 100
-    L5 = 150 - coupler_offset + 0.6275 - 3  # to make it `coupler_offset` um away from the resonator
+    L5 = 27.2513 + 150 + 150 - coupler_offset # to make it `coupler_offset` um away from the resonator
 
     s = c.s15
     s.chip.two_layer = False
@@ -396,9 +396,6 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     s.gapw = 1
     MaskMaker.Launcher(s)
     MaskMaker.CPWSturn(s, L1, -90, R1, L2, 90, R1, L3, segments=5)
-    MaskMaker.CPWBend(s, -60, radius=100, segments=12)
-    MaskMaker.CPWStraight(s, L4)
-    MaskMaker.CPWBend(s, 60, radius=50, segments=12)
     MaskMaker.CPWStraight(s, L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
@@ -408,16 +405,14 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     s.gapw = 1
     MaskMaker.Launcher(s)
     MaskMaker.CPWSturn(s, L1, 90, R1, L2, -90, R1, L3, segments=5)
-    MaskMaker.CPWBend(s, 60, radius=100, segments=12)
-    MaskMaker.CPWStraight(s, L4)
-    MaskMaker.CPWBend(s, -60, radius=50, segments=12)
     MaskMaker.CPWStraight(s, L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
     ### Resonator Couplers
     c.two_layer = True
+    coupler_spacing = 0.8
     coupler_offset_v = 1.5 + 1.2 - 1. - 0.73
-    coupler_offset_h = 100
+    coupler_offset_h = 262.4025 - coupler_spacing
     launch_pt = MaskMaker.translate_pt(c.center, (coupler_offset_h, coupler_offset_v))
     setattr(c, 'resonator_coupler_1', MaskMaker.Structure(c, start=launch_pt, direction=90))
     launch_pt = MaskMaker.translate_pt(c.center, (coupler_offset_h, -coupler_offset_v))
@@ -433,10 +428,10 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     coupler_2.pinw = 1.2
     coupler_2.gapw = res_coupler_gap
 
-    MaskMaker.CPWStraight(coupler_1, coupler_offset - 0.75 + 0.730 - 3.2822 + chip_coupler_length + 6 - .6978)
+    MaskMaker.CPWStraight(coupler_1, coupler_offset + chip_coupler_length)
     MaskMaker.CPWStraight(coupler_1, 1.5, pinw=0, gapw=end_cap_gap)
 
-    MaskMaker.CPWStraight(coupler_2, coupler_offset - 0.75 + 0.730 - 3.2822 + chip_coupler_length + 6 - .6978)
+    MaskMaker.CPWStraight(coupler_2, coupler_offset + chip_coupler_length)
     MaskMaker.CPWStraight(coupler_2, 1.5, pinw=0, gapw=end_cap_gap)
 
     ### DC Guards
@@ -445,12 +440,13 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     launcher_gap_w = 2.5
     guard_radius = 1.2
     guard_taper_length = 6
+    guard_horizontal_2 = guardSHorizontal + 1876 - 300 - 1.24 - 1.4118 - 1.4980 - 0.1840 + (guard_pin_w / 2)
 
     s = c.s5
     s.chip.two_layer = False
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
-    MaskMaker.CPWSturn(s, 20, 90, 90, guardSHorizontal + 1875 - 300 - 1.24 - 1.4118 - 1.4980 - 0.1840, -60, 90, 20,
+    MaskMaker.CPWSturn(s, 20, 90, 90, guard_horizontal_2, -60, 90, 20,
                        segments=10)
     MaskMaker.CPWStraight(s, guardEndStraight)
     MaskMaker.CPWTaper(s, guard_taper_length, stop_pinw=guard_pin_w, stop_gapw=trap_gap)
@@ -461,7 +457,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     s.chip.two_layer = False
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
-    MaskMaker.CPWSturn(s, 20, -90, 90, guardSHorizontal + 1875 - 300 - 1.24 - 1.4118 - 1.4980 - 0.1840, 60, 90, 20,
+    MaskMaker.CPWSturn(s, 20, -90, 90, guard_horizontal_2, 60, 90, 20,
                        segments=10)
     MaskMaker.CPWStraight(s, guardEndStraight)
     MaskMaker.CPWTaper(s, guard_taper_length, stop_pinw=guard_pin_w, stop_gapw=trap_gap)
@@ -473,7 +469,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     s.chip.two_layer = False
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
-    MaskMaker.CPWSturn(s, 20, -90, 90, guardSHorizontal - 325 - 1.24 - 1.4118 - 1.4980 - 0.1840, 60, 90, 20,
+    MaskMaker.CPWSturn(s, 20, -90, 90, guard_horizontal_2 - 1900, 60, 90, 20,
                        segments=10)
     MaskMaker.CPWStraight(s, guardEndStraight)
     MaskMaker.CPWTaper(s, guard_taper_length, stop_pinw=guard_pin_w, stop_gapw=trap_gap)
@@ -484,7 +480,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     s.chip.two_layer = False
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
-    MaskMaker.CPWSturn(s, 20, 90, 90, guardSHorizontal - 325 - 1.24 - 1.4118 - 1.4980 - 0.1840, -60, 90, 20,
+    MaskMaker.CPWSturn(s, 20, 90, 90, guard_horizontal_2 - 1900, -60, 90, 20,
                        segments=10)
     MaskMaker.CPWStraight(s, guardEndStraight)
     MaskMaker.CPWTaper(s, guard_taper_length, stop_pinw=guard_pin_w, stop_gapw=trap_gap)
@@ -494,7 +490,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     # Resonator DC Bias pinch electrodes
     L1 = 20
     R = 20
-    L3 = - (resonator_length - 900 - wiggle_length) + 1450 - 40 - 36.86 + 0.15
+    L3 = - (resonator_length - 900 - wiggle_length) + 1450 - 40 - 36.86 + 0.15 + 1.5 +  - 0.15
     L5 = 4
     L6 = 2
     L4 = 450 - 40 - L1 - 0.4 - 1.070 - L5 - L6
@@ -502,13 +498,13 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, d=None, inductive_l
     s = c.s6
     MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
     MaskMaker.CPWSturn(s, L1, -90, R, L3, 90, R, L4, segments=3)
-    MaskMaker.CPWTaper(s, L5, stop_pinw=4, stop_gapw=0.4)
+    MaskMaker.CPWTaper(s, L5, stop_pinw=3.5, stop_gapw=0.5)
     MaskMaker.CPWStraight(s, L6)
 
     s = c.s8
     MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
     MaskMaker.CPWSturn(s, L1, 90, R, L3, -90, R, L4, segments=3)
-    MaskMaker.CPWTaper(s, L5, stop_pinw=4, stop_gapw=0.4)
+    MaskMaker.CPWTaper(s, L5, stop_pinw=3.5, stop_gapw=0.5)
     MaskMaker.CPWStraight(s, L6)
 
     s.chip.two_layer = True
@@ -530,7 +526,7 @@ if __name__ == "__main__":
                    (-18750., -21600.), (18750., -21600.)]
     MaskMaker.AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='gap', name='border_gap')
     MaskMaker.AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='pin', name='border_pin')
-    MaskMaker.AlphaNumText(m, text="DIS 161125", size=(400, 400), point=(7650, -19300), centered=True,
+    MaskMaker.AlphaNumText(m, text="DIS 170206", size=(400, 400), point=(7650, -19300), centered=True,
                            layer='gap')  # change the mask name/title here
     MaskMaker.AlphaNumText(m, text="M018 Ge Yang", size=(400, 400), point=(7650, -18500), centered=True,
                            layer='gap')  # change the mask name/title here
@@ -545,8 +541,12 @@ if __name__ == "__main__":
     solid = True
 
     # for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.42]):
-    for i, resonator_length in enumerate([2140 * 0.9 * 1.666, 2140 * 0.9 * 1.42 * 1.666]):
-        for j, coupler_length in enumerate([40 * 2, 60 * 2, 100]):
+    for i, (resonator_length, wiggle_length) in enumerate([
+        [2140 * 0.9 * 1.666, 2000],
+        [2140 * 0.9 * 1.42 * 1.666, 3000]
+    ]):
+
+        for j, coupler_length in enumerate([150, 200, 250]):
             for k, has_bubble_gum in enumerate([False, True]):
                 chip_name = 'r{}c{}{}'.format(i + 1, j + 1, 'b' if has_bubble_gum else "")
                 print('chip name: ', chip_name)
@@ -554,7 +554,10 @@ if __name__ == "__main__":
                                    chip_id_loc=(1300, 100), author_loc=(6900 - 120, 100), two_layer=two_layer,
                                    solid=solid, segments=10)
                 c.textsize = (80, 80)
-                chipDrw_1(c, chip_resonator_length=resonator_length, chip_coupler_length=coupler_length, d=d,
+                chipDrw_1(c,
+                          chip_resonator_length=resonator_length, chip_coupler_length=coupler_length,
+                          wiggle_length=wiggle_length,
+                          d=d,
                           inductive_launcher=has_bubble_gum)
                 m.add_chip(c, 1)
 
@@ -571,8 +574,8 @@ if __name__ == "__main__":
         colored(os.name, 'green')
     )
     chip_path = os.path.join(os.getcwd(), MaskName + '-' + c.name + '.dxf')
-    if os.name == 'posix':
-        subprocess.call('open -a "AutoCAD 2016" ' + chip_path, shell=True)
-    elif os.name == 'nt':
-        subprocess.Popen(
-            r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + chip_path + '" ')
+    # if os.name == 'posix':
+    #     subprocess.call('open -a "AutoCAD 2016" ' + chip_path, shell=True)
+    # elif os.name == 'nt':
+    #     subprocess.Popen(
+    #         r'"C:\Program Files\Autodesk\DWG TrueView 2014\dwgviewr.exe" "' + chip_path + '" ')

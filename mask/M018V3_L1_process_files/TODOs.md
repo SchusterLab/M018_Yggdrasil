@@ -1,0 +1,5 @@
+- [x] update pin gap
+- [x] update pin width
+- [x] update trap_L
+- [x] update resonator guard L
+- [x] change coupler design
