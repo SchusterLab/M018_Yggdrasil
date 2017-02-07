@@ -396,7 +396,8 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     s.pinw = 3
     s.gapw = 1
     MaskMaker.Launcher(s)
-    MaskMaker.CPWSturn(s, L1, -90, R1, coupler_offset_h, 90, R1, L3, segments=5)
+    MaskMaker.CPWStraight(s, L1 + R1 * 2 + L3)
+    # MaskMaker.CPWSturn(s, L1, -90, R1, coupler_offset_h, 90, R1, L3, segments=5)
     MaskMaker.CPWStraight(s, L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
@@ -405,7 +406,8 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     s.pinw = 3
     s.gapw = 1
     MaskMaker.Launcher(s)
-    MaskMaker.CPWSturn(s, L1, 90, R1, coupler_offset_h, -90, R1, L3, segments=5)
+    MaskMaker.CPWStraight(s, L1 + R1 * 2 + L3)
+    # MaskMaker.CPWSturn(s, L1, 90, R1, coupler_offset_h, -90, R1, L3, segments=5)
     MaskMaker.CPWStraight(s, L5)
     MaskMaker.CPWStraight(s, 1.5, pinw=0, gapw=2.5)
 
@@ -413,7 +415,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     c.two_layer = True
     coupler_spacing = 0.8
     coupler_offset_v = 1.5 + 1.2 - 1. - 0.73
-    coupler_offset_h = 462.4025 - coupler_spacing
+    coupler_offset_h = 462.4025 - coupler_spacing + 159.6475 - coupler_spacing
     launch_pt = MaskMaker.translate_pt(c.center, (coupler_offset_h, coupler_offset_v))
     setattr(c, 'resonator_coupler_1', MaskMaker.Structure(c, start=launch_pt, direction=90))
     launch_pt = MaskMaker.translate_pt(c.center, (coupler_offset_h, -coupler_offset_v))
