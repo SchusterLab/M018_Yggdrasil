@@ -325,29 +325,29 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     #     MaskMaker.CPWStraight(s, .1225, pinw=0, gapw=.22 / 2.)
 
     # Center Guard
-    length_to_trap = 450 - 5 - 10
-    guard_straight = 185.51 - 1.351 - 0.28
-    center_guard_taper = 5
-    guard_middle_pinch_length = 4 + 0.371
-    guardSHorizontal = 445. - 300
-
-    s = c.s14
-    s.chip.two_layer = False
-    MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
-    MaskMaker.CPWStraight(s, length_to_trap - 400)
-    MaskMaker.CPWSturn(s, 20, 90, 90, guardSHorizontal, -90, 90, 20, segments=10)
-    MaskMaker.CPWStraight(s, guard_straight)
-    MaskMaker.CPWTaper(s, center_guard_taper, stop_pinw=trap_L, stop_gapw=trap_gap)
-    MaskMaker.CPWStraight(s, guard_middle_pinch_length)
-
-    s = c.s18
-    s.chip.two_layer = False
-    MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
-    MaskMaker.CPWStraight(s, length_to_trap - 400)
-    MaskMaker.CPWSturn(s, 20, -90, 90, guardSHorizontal, 90, 90, 20, segments=10)
-    MaskMaker.CPWStraight(s, guard_straight)
-    MaskMaker.CPWTaper(s, center_guard_taper, stop_pinw=trap_L, stop_gapw=trap_gap)
-    MaskMaker.CPWStraight(s, guard_middle_pinch_length)
+    # length_to_trap = 450 - 5 - 10
+    # guard_straight = 185.51 - 1.351 - 0.28
+    # center_guard_taper = 5
+    # guard_middle_pinch_length = 4 + 0.371
+    # guardSHorizontal = 445. - 300
+    #
+    # s = c.s14
+    # s.chip.two_layer = False
+    # MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
+    # MaskMaker.CPWStraight(s, length_to_trap - 400)
+    # MaskMaker.CPWSturn(s, 20, 90, 90, guardSHorizontal, -90, 90, 20, segments=10)
+    # MaskMaker.CPWStraight(s, guard_straight)
+    # MaskMaker.CPWTaper(s, center_guard_taper, stop_pinw=trap_L, stop_gapw=trap_gap)
+    # MaskMaker.CPWStraight(s, guard_middle_pinch_length)
+    #
+    # s = c.s18
+    # s.chip.two_layer = False
+    # MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
+    # MaskMaker.CPWStraight(s, length_to_trap - 400)
+    # MaskMaker.CPWSturn(s, 20, -90, 90, guardSHorizontal, 90, 90, 20, segments=10)
+    # MaskMaker.CPWStraight(s, guard_straight)
+    # MaskMaker.CPWTaper(s, center_guard_taper, stop_pinw=trap_L, stop_gapw=trap_gap)
+    # MaskMaker.CPWStraight(s, guard_middle_pinch_length)
 
     mid_pt = MaskMaker.translate_pt(MaskMaker.middle(c.s1.last, c.s2.last), (-300, 0))
     s.last = mid_pt
@@ -445,22 +445,22 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     guard_taper_length = 6
     guard_horizontal_2 = guardSHorizontal + 1876 - 300 - 1.24 - 1.4118 - 1.4980 - 0.1840 + (guard_pin_w / 2)
 
-    s = c.s5
+    s = c.s14
     s.chip.two_layer = False
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
-    MaskMaker.CPWSturn(s, 20, 90, 90, guard_horizontal_2, -60, 90, 20,
+    MaskMaker.CPWSturn(s, 20, 90, 90, guard_horizontal_2 - 1875, -60, 90, 20,
                        segments=10)
     MaskMaker.CPWStraight(s, guardEndStraight)
     MaskMaker.CPWTaper(s, guard_taper_length, stop_pinw=guard_pin_w, stop_gapw=trap_gap)
     MaskMaker.CPWBend(s, -30, radius=guard_radius, segments=1)
     MaskMaker.CPWStraight(s, sideGuardEndStraight)
 
-    s = c.s7
+    s = c.s18
     s.chip.two_layer = False
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
-    MaskMaker.CPWSturn(s, 20, -90, 90, guard_horizontal_2, 60, 90, 20,
+    MaskMaker.CPWSturn(s, 20, -90, 90, guard_horizontal_2 - 1875, 60, 90, 20,
                        segments=10)
     MaskMaker.CPWStraight(s, guardEndStraight)
     MaskMaker.CPWTaper(s, guard_taper_length, stop_pinw=guard_pin_w, stop_gapw=trap_gap)
@@ -515,7 +515,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
 
 if __name__ == "__main__":
     ### define mask name, and open up an explorer window
-    MaskName = "M018V3"  # M006 Constriction Gate Resonator"
+    MaskName = "M018V4"  # M006 Constriction Gate Resonator"
 
     m = MaskMaker.WaferMask(MaskName, flat_angle=90., flat_distance=24100., wafer_padding=3.3e3, chip_size=(7000, 1900),
                             dicing_border=400, etchtype=False, wafer_edge=False,
@@ -529,11 +529,11 @@ if __name__ == "__main__":
                    (-18750., -21600.), (18750., -21600.)]
     MaskMaker.AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='gap', name='border_gap')
     MaskMaker.AlignmentCross(m, linewidth=200, size=(200, 200), points=border_locs, layer='pin', name='border_pin')
-    MaskMaker.AlphaNumText(m, text="DIS 170206", size=(400, 400), point=(7650, -19300), centered=True,
+    MaskMaker.AlphaNumText(m, text="DIS 170207", size=(400, 400), point=(7650, -19300), centered=True,
                            layer='gap')  # change the mask name/title here
     MaskMaker.AlphaNumText(m, text="M018 Ge Yang", size=(400, 400), point=(7650, -18500), centered=True,
                            layer='gap')  # change the mask name/title here
-    MaskMaker.AlphaNumText(m, text="DIS 161125 M018 Ge Yang", size=(700, 700), point=(0, 20500), centered=True,
+    MaskMaker.AlphaNumText(m, text="DIS 170207 M018 Ge Yang", size=(700, 700), point=(0, 20500), centered=True,
                            layer='gap')  # change the mask name/title here
 
     # m.randomize_layout()
