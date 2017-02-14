@@ -586,7 +586,8 @@ if __name__ == "__main__":
                           wiggle_length=wiggle_length,
                           d=d,
                           inductive_launcher=has_bubble_gum)
-                m.add_chip(c, 1)
+                if i == 1 and j ==0 and k == 0:
+                    m.add_chip(c, 65)
 
     m.save()
     ### Check and open the folder
