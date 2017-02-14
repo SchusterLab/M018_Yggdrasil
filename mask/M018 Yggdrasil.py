@@ -169,10 +169,34 @@ def chipInit(c, defaults):
     MaskMaker.BoxShapeAlignmentMarks(alignment3, 2, 25, layer='gap')
     MaskMaker.BoxShapeAlignmentMarks(alignment4, 2, 25, layer='gap')
 
+    # alignments
+    c.via_layer.last_direction = 0
+
+    c.via_layer.last = c.left_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(2600, 150))
+    c.via_layer.last = c.left_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(2600, -150))
+
+    c.via_layer.last = c.left_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(3700, 150))
+    c.via_layer.last = c.left_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(3700, -150))
+
+    c.via_layer.last = c.right_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-1600, 150))
+    c.via_layer.last = c.right_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-1600, -150))
+
+    c.via_layer.last = c.right_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-2800, 150))
+    c.via_layer.last = c.right_midpt
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-2800, -150))
+
 
 def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=None, inductive_launcher=False):
     ### Chip Init
     # gapw=calculate_gap_width(eps_eff,50,pinw)
+
 
     print(d.__dict__.keys())
     if d == None: d = MaskMaker.ChipDefaults()
