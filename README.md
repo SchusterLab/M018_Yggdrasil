@@ -12,7 +12,7 @@ mask `dxf` files. Here is an example of our design:
 
 ![m018v4_yggdrasil_R2C1](figures/Screenshot 2017-02-14 10.54.46.png)
 
-![m018v4_yggdrasil_full_wafer](figures/screenshot 2017-02-14 10.54.19.png)
+![m018v4_yggdrasil_full_wafer](figures/Screenshot 2017-02-14 10.54.19.png)
 
 
 
