@@ -1,5 +1,7 @@
 # M018_Yggdrasil
-Yggdrasil is our newest generation single electron quantum bit experiment. :+1:
+Yggdrasil is our newest generation single electron quantum bit experiment. :+1: 
+This project is a collaboration between **Ge Yang** ([@episodeyang](https://github.com/episodeyang))
+and **Gerwin Koolstra** ([@gkoolstra](https://github.com/gkoolstra)) at the University of Chicago.
 
 The `simulations` folder contains several files that help us with the simulation of our sample. Please note: 
 - `.aedt` files are created using Ansys Electronics Desktop 2015.
