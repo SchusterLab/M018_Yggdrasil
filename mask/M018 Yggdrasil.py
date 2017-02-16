@@ -158,39 +158,39 @@ def chipInit(c, defaults):
     setattr(c, 's18', MaskMaker.Structure(c, start=c.bottom_left_mid_right, direction=90, defaults=defaults))
     setattr(c, 's19', MaskMaker.Structure(c, start=c.bottom_right_mid_left, direction=90, defaults=defaults))
     setattr(c, 's20', MaskMaker.Structure(c, start=c.bottom_right_mid_right, direction=90, defaults=defaults))
-    MaskMaker.FineAlign(c, al=25, mark_type='box', solid=solid)
+    MaskMaker.FineAlign(c, al=50, wid=50, mark_type='box', solid=solid)
 
     alignment1 = MaskMaker.Structure(c, start=(c.top_midpt[0] - 1400, c.top_midpt[1] - 60), layer='gap')
     alignment2 = MaskMaker.Structure(c, start=(c.bottom_midpt[0] - 1400, c.bottom_midpt[1] + 60), layer='gap')
     alignment3 = MaskMaker.Structure(c, start=(c.bottom_midpt[0] + 1400, c.bottom_midpt[1] + 60), layer='gap')
     alignment4 = MaskMaker.Structure(c, start=(c.top_midpt[0] + 1400, c.top_midpt[1] - 60), layer='gap')
-    MaskMaker.BoxShapeAlignmentMarks(alignment1, 2, 25, layer='gap', solid=solid)
-    MaskMaker.BoxShapeAlignmentMarks(alignment2, 2, 25, layer='gap', solid=solid)
-    MaskMaker.BoxShapeAlignmentMarks(alignment3, 2, 25, layer='gap', solid=solid)
-    MaskMaker.BoxShapeAlignmentMarks(alignment4, 2, 25, layer='gap', solid=solid)
+    MaskMaker.Box(alignment1, 50, 50, offset=(0, 0), solid=solid)
+    MaskMaker.Box(alignment2, 50, 50, offset=(0, 0), solid=solid)
+    MaskMaker.Box(alignment3, 50, 50, offset=(0, 0), solid=solid)
+    MaskMaker.Box(alignment4, 50, 50, offset=(0, 0), solid=solid)
 
     # alignments
     c.via_layer.last_direction = 0
 
     c.via_layer.last = c.left_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(2600, 150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(2600, 150), solid=solid)
     c.via_layer.last = c.left_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(2600, -150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(2600, -150), solid=solid)
 
     c.via_layer.last = c.left_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(3700, 150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(3700, 150), solid=solid)
     c.via_layer.last = c.left_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(3700, -150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(3700, -150), solid=solid)
 
     c.via_layer.last = c.right_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(-1600, 150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-1600, 150), solid=solid)
     c.via_layer.last = c.right_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(-1600, -150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-1600, -150), solid=solid)
 
     c.via_layer.last = c.right_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(-2800, 150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-2800, 150), solid=solid)
     c.via_layer.last = c.right_midpt
-    MaskMaker.Box(c.via_layer, 100, 100, offset=(-2800, -150))
+    MaskMaker.Box(c.via_layer, 100, 100, offset=(-2800, -150), solid=solid)
 
 
 def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=None, inductive_launcher=False):
