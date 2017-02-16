@@ -114,7 +114,7 @@ def set_mask_init():
     d.center_gapw = 1
     ### Now calculate impedance
     d.imp_rsn = 80.  # calculate_impedance(d.pinw_rsn,d.gapw_rsn,d.eps_eff)
-    d.solid = True
+    d.solid = False
     return d
 
 
@@ -158,16 +158,16 @@ def chipInit(c, defaults):
     setattr(c, 's18', MaskMaker.Structure(c, start=c.bottom_left_mid_right, direction=90, defaults=defaults))
     setattr(c, 's19', MaskMaker.Structure(c, start=c.bottom_right_mid_left, direction=90, defaults=defaults))
     setattr(c, 's20', MaskMaker.Structure(c, start=c.bottom_right_mid_right, direction=90, defaults=defaults))
-    MaskMaker.FineAlign(c, al=25, mark_type='box')
+    MaskMaker.FineAlign(c, al=25, mark_type='box', solid=solid)
 
     alignment1 = MaskMaker.Structure(c, start=(c.top_midpt[0] - 1400, c.top_midpt[1] - 60), layer='gap')
     alignment2 = MaskMaker.Structure(c, start=(c.bottom_midpt[0] - 1400, c.bottom_midpt[1] + 60), layer='gap')
     alignment3 = MaskMaker.Structure(c, start=(c.bottom_midpt[0] + 1400, c.bottom_midpt[1] + 60), layer='gap')
     alignment4 = MaskMaker.Structure(c, start=(c.top_midpt[0] + 1400, c.top_midpt[1] - 60), layer='gap')
-    MaskMaker.BoxShapeAlignmentMarks(alignment1, 2, 25, layer='gap')
-    MaskMaker.BoxShapeAlignmentMarks(alignment2, 2, 25, layer='gap')
-    MaskMaker.BoxShapeAlignmentMarks(alignment3, 2, 25, layer='gap')
-    MaskMaker.BoxShapeAlignmentMarks(alignment4, 2, 25, layer='gap')
+    MaskMaker.BoxShapeAlignmentMarks(alignment1, 2, 25, layer='gap', solid=solid)
+    MaskMaker.BoxShapeAlignmentMarks(alignment2, 2, 25, layer='gap', solid=solid)
+    MaskMaker.BoxShapeAlignmentMarks(alignment3, 2, 25, layer='gap', solid=solid)
+    MaskMaker.BoxShapeAlignmentMarks(alignment4, 2, 25, layer='gap', solid=solid)
 
     # alignments
     c.via_layer.last_direction = 0
@@ -565,7 +565,7 @@ if __name__ == "__main__":
     # two_layer = True
     # solid = False
     two_layer = True
-    solid = True
+    solid = False
 
     # for i, resonator_length in enumerate([2140 * 0.9, 2140 * 0.9 * 1.42]):
     for i, (resonator_length, wiggle_length) in enumerate([
