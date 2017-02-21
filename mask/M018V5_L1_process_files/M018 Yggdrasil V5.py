@@ -309,21 +309,21 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
 
     s = c.s4
     s.chip.two_layer = True
-    pinw = res_pin_W * 2 + res_center_gap_W
-    gapw = 1.5
+    pinw=res_pin_W * 2
+    gapw=res_center_gap_W / 2 + res_gp_gap_W
 
     if inductive_launcher:
         MaskMaker.Inductive_Launcher(s, pinw=25, gapw=20, padw=200, padl=300, num_loops=4)
+        MaskMaker.CPWTaper(s, 80, stop_pinw=pinw, stop_gapw=gapw)
     else:
-        MaskMaker.Launcher(s, pinw=1.5, gapw=1.5)
-        MaskMaker.CPWStraight(s, 245)
+        MaskMaker.Launcher(s, pinw=pinw, gapw=gapw)
+        MaskMaker.CPWStraight(s, 245 + 80)
 
     right_launcher_straight = 2000 + wiggle_length - 80 - 245. - chip_resonator_length + 280 + 229.890 + 300 + 0.75 + guard_gap * 2 + trap_guard_L
     # cprint("right_launcher_straight: {}".format(right_launcher_straight), color="red")
 
-    MaskMaker.CPWTaper(s, 80, stop_pinw=pinw, stop_gapw=gapw)
     MaskMaker.CPWStraight(s, right_launcher_straight)
-    MaskMaker.CPWTaper(s, 1, stop_pinw=res_pin_W * 2, stop_gapw=res_center_gap_W / 2 + res_gp_gap_W)
+    MaskMaker.CPWTaper(s, 1)
     MaskMaker.CPWStraight(s, 4.5)
     MaskMaker.CPWTaper(s, 1)  ##, stop_pinw=1.5, stop_gapw=(channel_W - 1.5) / 2)
     MaskMaker.CPWStraight(s, 10)
@@ -471,6 +471,7 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
 
     bonding_pad_W = 150
     bonding_pad_gap = 20
+    bonding_pad_gap_curve = 25
     # Trap Side Guards
     s = c.s14
     s.chip.two_layer = False
@@ -516,9 +517,9 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
     MaskMaker.CPWStraight(s, 20)
-    MaskMaker.CPWBend(s, -50, radius=90, segments=10)
-    MaskMaker.CPWBend(s, -20, radius=90, segments=10, gapw=(bonding_pad_W - s.pinw) / 2)
-    MaskMaker.CPWBend(s, -20, radius=90, segments=10, pinw=bonding_pad_W - bonding_pad_gap * 2, gapw=bonding_pad_gap)
+    MaskMaker.CPWBend(s, -60, radius=90, segments=10)
+    MaskMaker.CPWBend(s, -15, radius=90, segments=10, gapw=(bonding_pad_W - s.pinw) / 2)
+    MaskMaker.CPWBend(s, -10, radius=90, segments=10, pinw=bonding_pad_W - bonding_pad_gap_curve * 2, gapw=bonding_pad_gap_curve)
     # MaskMaker.CPWStraight(s, 10, gapw=(bonding_pad_W - s.pinw) / 2)
     MaskMaker.CPWStraight(s, guard_horizontal_2 - 1900 - 10, pinw=bonding_pad_W - bonding_pad_gap * 2,
                           gapw=bonding_pad_gap)
@@ -537,9 +538,9 @@ def chipDrw_1(c, chip_resonator_length, chip_coupler_length, wiggle_length, d=No
     MaskMaker.Launcher(s, pinw=launcher_pin_w, gapw=launcher_gap_w)
     MaskMaker.CPWStraight(s, guardLauncherStraight)
     MaskMaker.CPWStraight(s, 20)
-    MaskMaker.CPWBend(s, 50, radius=90, segments=10)
-    MaskMaker.CPWBend(s, 20, radius=90, segments=10, gapw=(bonding_pad_W - s.pinw) / 2)
-    MaskMaker.CPWBend(s, 20, radius=90, segments=10, pinw=bonding_pad_W - bonding_pad_gap * 2, gapw=bonding_pad_gap)
+    MaskMaker.CPWBend(s, 60, radius=90, segments=10)
+    MaskMaker.CPWBend(s, 15, radius=90, segments=10, gapw=(bonding_pad_W - s.pinw) / 2)
+    MaskMaker.CPWBend(s, 10, radius=90, segments=10, pinw=bonding_pad_W - bonding_pad_gap_curve * 2, gapw=bonding_pad_gap_curve)
     # MaskMaker.CPWStraight(s, 10, gapw=(bonding_pad_W - s.pinw) / 2)
     MaskMaker.CPWStraight(s, guard_horizontal_2 - 1900 - 10, pinw=bonding_pad_W - bonding_pad_gap * 2,
                           gapw=bonding_pad_gap)
@@ -612,7 +613,7 @@ if __name__ == "__main__":
         [2140 * 0.9 * 1.42 * 1.666, 3000]
     ]):
 
-        for j, coupler_length in enumerate([150, 200, 250]):
+        for j, coupler_length in enumerate([180]):
             for k, has_bubble_gum in enumerate([False, True]):
                 chip_name = 'r{}c{}{}'.format(i + 1, j + 1, 'b' if has_bubble_gum else "")
                 print('chip name: ', chip_name)
