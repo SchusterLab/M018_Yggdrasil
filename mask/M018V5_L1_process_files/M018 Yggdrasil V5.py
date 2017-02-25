@@ -633,7 +633,9 @@ if __name__ == "__main__":
                           d=d,
                           inductive_launcher=has_bubble_gum)
                 if i == 1 and j == 0 and k == 0:
-                    m.add_chip(c, 65)
+                    m.add_chip(c, 32)
+                elif i == 1 and j == 0 and k == 1:
+                    m.add_chip(c, 32)
 
     m.save()
     ### Check and open the folder

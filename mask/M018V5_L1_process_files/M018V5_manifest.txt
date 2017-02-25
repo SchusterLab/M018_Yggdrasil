@@ -1,10 +1,18 @@
-Mask:	M018V5	Total Chips:	65
+Mask:	M018V5	Total Chips:	64
 ID	Copies	Short Description	Chip Type	Chip Info
-R2C1	65	Chip is a class which contains structures
+R2C1	32	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+R2C1B	32	Chip is a class which contains structures
        Perhaps it will also be used to do some error checking
     
 ______________________
-R2C1	65	Chip is a class which contains structures
+R2C1	32	Chip is a class which contains structures
+       Perhaps it will also be used to do some error checking
+    
+
+______________________
+R2C1B	32	Chip is a class which contains structures
        Perhaps it will also be used to do some error checking
     
 
