@@ -1,5 +1,5 @@
 # M018_Yggdrasil
-Yggdrasil is our newest generation single electron quantum bit experiment. :+1: 
+Yggdrasil is our newest generation single electron quantum bit experiment.
 This project is a collaboration between **Ge Yang** ([@episodeyang](https://github.com/episodeyang))
 and **Gerwin Koolstra** ([@gkoolstra](https://github.com/gkoolstra)) at the University of Chicago.
 
@@ -12,9 +12,9 @@ Please do not convert these files to later versions of Ansys software and then c
 The `mask` folder contains versioned mask script and 
 mask `dxf` files. Here is an example of our design:
 
-![m018v4_yggdrasil_R2C1](figures/Screenshot 2017-02-14 10.54.46.png)
+![m018v4_yggdrasil_R2C1](figures/chip.png)
 
-![m018v4_yggdrasil_full_wafer](figures/Screenshot 2017-02-14 10.54.19.png)
+![m018v4_yggdrasil_full_wafer](figures/wafer.png)
 
 
 
