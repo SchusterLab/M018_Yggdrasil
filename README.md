@@ -16,5 +16,11 @@ mask `dxf` files. Here is an example of our design:
 
 ![m018v4_yggdrasil_full_wafer](figures/wafer.png)
 
+## References
+More information can be found in the following theses and papers.
+- [Ge Yang's PhD Thesis](https://knowledge.uchicago.edu/record/2199?ln=en)
+- [Coupling an Ensemble of Electrons on Superfluid Helium to a Superconducting Circuit](https://journals.aps.org/prx/abstract/10.1103/PhysRevX.6.011031)
+- [Gerwin Koolstra's PhD Thesis](https://knowledge.uchicago.edu/record/2070?ln=en)
+- [Coupling a single electron on superfluid helium to a superconducting resonator](https://www.nature.com/articles/s41467-019-13335-7)
 
 
